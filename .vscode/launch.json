@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Run Scraper",
-            "program" : "${workspaceFolder}\\crawler\\index2.js"
+            "program" : "${workspaceFolder}\\index.js"
         }
 	]
 }

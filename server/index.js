@@ -1,16 +1,19 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 
-export default class Server {
+const Router = require('./router')
+
+module.exports = class Server {
 
 	_server = null
 	_app = null
 	
 	constructor() {
 		this._app = express()
-		this._app.set("port", this.port)
+		this._app.set("port", this.getPort())
 
 		this.configureMiddleware()
+		this.configureRoutes()
 	}
 
 	configureMiddleware() {
@@ -27,13 +30,17 @@ export default class Server {
         })
 	}
 
+	configureRoutes() {
+		new Router(this._app).addRoutes()
+	}
+
 	start() {
         this._server = this._app.listen(this._app.get("port"), () => {
             console.log("🚀 Server is running on port " + this._app.get("port"));
         });
     }
 
-	static get port() {
+	getPort() {
 		return process.env.PORT || 4000
 	}
 
