@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="crudAlpine()" x-init="initialize">
+	<header class="text-center bg-blue-800 text-white p-4 mb-10">
+		<div class="text-3xl md:text-5xl mb-3 font-bold"><i class="fa fa-bolt mr-2"></i>Importer App</div>
+		<p>API by <a class="text-blue-300" href="#">Me</a></p>
+	</header>
+	<div class="container mx-auto">
+		<div class="flex flex-row mb-10 items-center">
+			<ul class="flex">
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="index.html">Shops</a>
+				</li>
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="catalogs.html">Catalogs</a>
+				</li>
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="products.html">Products</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container mx-auto">
+		<div class="flex flex-row mb-3 items-center">
+			<div class="mb-4">
+				<input x-model="title" x-ref="titleInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Title">
+			</div>
+			<div class="mb-4 ml-5">
+				<select x-model="sourceType" x-ref="sourceTypeInput" required class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+					<option value="" disabled>Select Source type</option>
+					<option value="scraper">Scraper</option>
+					<option value="heureka">Heureka</option>
+					<option value="google">Google</option>
+				</select>
+			</div>
+			<template x-if="getSourceType() == 'xml'">
+				<div class="mb-4 ml-5">
+					<input x-model="sourceURL" x-ref="sourceURLInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Source URL">
+				</div>
+			</template>
+			<template x-if="getSourceType() == 'scraper'">
+
+				<div>
+
+					<div class="mb-4 ml-5">
+						<select x-model="scraper" x-ref="scraperInput" required class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+							<option value="" disabled>Select Scraper</option>
+							<template x-for="scraper in scrapers">
+								<option :value="scraper" x-text="scraper">scraper</option>	
+							</template>
+						</select>
+					</div>
+					
+					<div class="ml-5 mb-3 xl:w-96">
+						<textarea x-model="scraperConfig" x-ref="scraperConfigInput"
+						class="
+							form-control
+							block
+							w-full
+							px-3
+							py-1.5
+							text-base
+							font-normal
+							text-gray-700
+							bg-white bg-clip-padding
+							border border-solid border-gray-300
+							rounded
+							transition
+							ease-in-out
+							m-0
+							focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+						"
+						id="exampleFormControlTextarea1"
+						rows="3"
+						placeholder="Your message"
+						></textarea>
+					</div>
+				</div>
+			</template>
+			<div class="mb-4 ml-5">
+				<button @click="createShop()"
+					class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+					Add new shop
+				</button>
+				<button @click="saveShop()"
+					class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+					Save edited shop
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="container mx-auto mt-5">
+		<div class="flex flex-col">
+			<div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+				<div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+					<div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+						<table class="min-w-full divide-y divide-gray-200">
+							<thead class="bg-gray-50">
+								<tr>
+									<th scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Title
+									</th>
+									<th scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Source Type
+									</th>
+									<th scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+										Status
+									</th>
+									<th scope="col" class="relative px-6 py-3">
+										<span class="sr-only">Edit</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200">
+								<tr>
+								  <td class="px-6 py-4 whitespace-nowrap">
+									<div class="flex items-center">
+									  <div class="flex-shrink-0 h-10 w-10">
+										<img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=60" alt="">
+									  </div>
+									  <div class="ml-4">
+										<div class="text-sm font-medium text-gray-900">
+										  Jane Cooper
+										</div>
+										<div class="text-sm text-gray-500">
+										  jane.cooper@example.com
+										</div>
+									  </div>
+									</div>
+								  </td>
+								  <td class="px-6 py-4 whitespace-nowrap">
+									<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+									  Active
+									</span>
+								  </td>
+								  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+									Admin
+								  </td>
+								  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+									<a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+								  </td>
+								</tr>
+								<template x-for="shop in shops" :key="shop._id">
+									<tr>
+										<td x-text="shop.title" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" scope="row"></td>
+										<td x-text="getSourcesString(shop)" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" scope="row"></td>
+										<td class="px-6 py-4 whitespace-nowrap">
+										  <span x-text="shop.processing" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"></span>
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end">
+											<template x-if="getShopSourceType(shop).includes('heureka')" x-data="{ isProcessing: false, innerText: 'Process Heureka XML' }">
+												<button type="button" @click="processShop(shop, 'heureka')" :disabled="isProcessing" class="inline-flex bg-indigo-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+													<svg x-show="isProcessing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+														<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"></circle>
+														<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path>
+													</svg>
+													<span x-text="innerText"></span>
+												</button>
+											</template>
+											<template x-if="getShopSourceType(shop).includes('google')" x-data="{ isProcessing: false, innerText: 'Process Google XML' }">
+												<button type="button" @click="processShop(shop, 'google')" :disabled="isProcessing" class="inline-flex bg-indigo-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+													<svg x-show="isProcessing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+														<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"></circle>
+														<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path>
+													</svg>
+													<span x-text="innerText"></span>
+												</button>
+											</template>
+											<a href="#" @click="deleteShop(shop)" class="text-indigo-600 hover:text-indigo-900 mr-3">Delete</a>
+											<a href="#" @click="editShop(shop)" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+										</td>
+									</tr>
+								</template>
+							  </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="assets/main.js"></script>
+<script>
+	function crudAlpine(){
+		return {
+			initialize: function() {
+				this.shops = this.loadShops()
+			},
+			loadShops: async function() {
+				return new Promise(async (resolve, reject) => {
+					fetch(apis.shopsEndpointUrl)
+					.then(r => r.json())
+					.then((data) => {
+						return resolve(data)
+					}).catch(err =>{
+						return reject(err)
+					})
+				})
+			},
+			loadScrapers: async function() {
+				return new Promise(async (resolve, reject) => {
+					fetch(apis.shopsEndpointUrl)
+					.then(r => r.json())
+					.then((data) => {
+						return resolve(data)
+					}).catch(err =>{
+						return reject(err)
+					})
+				})
+			}
+		}
+	}
+</script>
+

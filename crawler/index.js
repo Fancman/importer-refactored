@@ -1,15 +1,24 @@
-class Domain {
-	constructor( name ) {
-		this.name = name
-	}
-}
+'use strict';
 
-let DomainsCollection = function() {
-	let domains = {}
+export class StrategyManager {
 
-	return {
-		registerDomain: function( domain ) {
-			domains[domain.name] = domain
-		}
+	_strategies = []
+	
+	constructor() {}
+
+	addStrategy(strategy) {
+		this._strategies = [ ...this._strategies, strategy ]
 	}
+
+	getStrategy(name) {
+		return this._strategies.find(strategy => strategy.name === name)
+	}
+
+
+	getStrategiesNames() {
+		return [ ...this._strategies.reduce( function(a, b){
+			return b.name
+		}) ]
+	}
+
 }

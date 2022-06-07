@@ -45,6 +45,5 @@ function getMongoModel(modelName, modelSchema, collectionName) {
 
 
 module.exports = {
-	runMongo,
 	getMongoModel
 }

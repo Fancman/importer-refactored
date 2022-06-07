@@ -30,7 +30,6 @@ module.exports = class ShopRepositoryFascade {
 		}
 	}
 
-
 	async findAllLeanShopsWithCounts(shops){
 		for (const [index, shop] of shops.entries()) {
 
