@@ -1,8 +1,8 @@
-const slugify = require('slugify')
+import slugify from 'slugify';
 
-const ShopSchema = require('../schemas/Shop')
+import ShopSchema from '../schemas/Shop.js'
 
-const { getMongoModel } = require('../index')
+import { getMongoModel } from '../index.js'
 
 ShopSchema.pre('save', async function(next) {
 	this.slug = slugify(this.title)
@@ -24,6 +24,6 @@ ShopSchema.pre('save', async function(next) {
 
 let ShopModel = getMongoModel('shop', ShopSchema)
 
-module.exports = {
+export {
 	ShopModel
 }

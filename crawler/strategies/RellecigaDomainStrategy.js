@@ -1,6 +1,6 @@
-/*const DomainStrategy = require('./index')
+import DomainStrategy from './index.js'
 
-module.exports = class RellecigaDomainStrategy extends DomainStrategy {
+export default class RellecigaDomainStrategy extends DomainStrategy {
 	name = 'relleciga.sk'
 
 	constructor(){
@@ -10,4 +10,4 @@ module.exports = class RellecigaDomainStrategy extends DomainStrategy {
 	log(){
 		console.log("TEST")
 	}
-}*/
+}

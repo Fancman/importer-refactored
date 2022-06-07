@@ -1,8 +1,8 @@
-const express = require('express')
+import express from "express"
 
-const ShopRepositoryFascade = require('../../database/repositories/Shop')
+import ShopRepositoryFascade from "../../database/repositories/Shop.js"
 
-module.exports = class ShopRoute {
+export default class ShopRoute {
 
 	_router = null
 	

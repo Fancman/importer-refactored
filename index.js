@@ -1,7 +1,7 @@
-const Server = require("./server/index");
-const StrategyManager = require("./crawler/index")
+import Server from "./server/index.js"
+import StrategyManager from "./crawler/index.js"
 
-//const RellecigaDomainStrategy = require("./crawler/strategies/RellecigaDomainStrategy")
+import RellecigaDomainStrategy from './crawler/strategies/RellecigaDomainStrategy.js'
 
 (async () => {
 	/*console.log("START")
@@ -10,9 +10,11 @@ const StrategyManager = require("./crawler/index")
 
 	let strategyManager = new StrategyManager();
 
-	//strategyManager.addStrategy(new RellecigaDomainStrategy())
+	strategyManager.addStrategy(new RellecigaDomainStrategy())
 
-	let server = new Server();
+	//console.log(strategyManager.getStrategiesNames())
+
+	let server = new Server(strategyManager);
 	
 	server.start();
 })();

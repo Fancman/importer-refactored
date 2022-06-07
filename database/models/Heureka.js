@@ -1,6 +1,6 @@
-const HeurekaSchema = require('../schemas/Heureka')
+import HeurekaSchema from '../schemas/Heureka.js'
 
-const { getMongoModel } = require('../index')
+import { getMongoModel } from '../index.js'
 
 let HeurekaModel = getMongoModel('heureka_product', HeurekaSchema)
 
@@ -8,7 +8,7 @@ const HeurekaModelCollection = async function(catalog_name){
 	return getMongoModel('heureka_product', HeurekaSchema, catalog_name)
 }
 
-module.exports = {
+export {
 	HeurekaModel,
 	HeurekaModelCollection
 }

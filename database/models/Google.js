@@ -1,6 +1,6 @@
-const GoogleSchema = require('../schemas/Google')
+import GoogleSchema from '../schemas/Google.js'
 
-const { getMongoModel } = require('../index')
+import { getMongoModel } from '../index.js'
 
 let GoogleModel = getMongoModel('google_product', GoogleSchema)
 
@@ -8,7 +8,7 @@ const GoogleModelCollection = async function(catalog_name){
 	return getMongoModel('google_product', GoogleSchema, catalog_name)
 }
 
-module.exports = {
+export {
 	GoogleModel,
 	GoogleModelCollection
 }

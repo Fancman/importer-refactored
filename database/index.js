@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from "mongoose";
 
 var datastoreModel = {
     process: function () {
@@ -44,6 +44,6 @@ function getMongoModel(modelName, modelSchema, collectionName) {
 }
 
 
-module.exports = {
+export {
 	getMongoModel
 }

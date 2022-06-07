@@ -1,4 +1,4 @@
-module.exports = class DomainStrategy {
+export default class DomainStrategy {
 	constructor(){}
 
 	getLinksAndPagination(){}

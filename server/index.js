@@ -1,16 +1,18 @@
-const express = require("express")
-const bodyParser = require("body-parser")
+import express from "express"
+import bodyParser from "body-parser"
 
-const Router = require('./router')
+import Router from "./router.js"
 
-module.exports = class Server {
+export default class Server {
 
 	_server = null
 	_app = null
+	_strategymanager = null
 	
-	constructor() {
+	constructor(strategyManager) {
 		this._app = express()
 		this._app.set("port", this.getPort())
+		this._strategymanager = strategyManager
 
 		this.configureMiddleware()
 		this.configureRoutes()
@@ -31,7 +33,7 @@ module.exports = class Server {
 	}
 
 	configureRoutes() {
-		new Router(this._app).addRoutes()
+		new Router(this._app, this._strategymanager).addRoutes()
 	}
 
 	start() {

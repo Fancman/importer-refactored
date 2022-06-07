@@ -1,6 +1,6 @@
 'use strict';
 
-export class StrategyManager {
+export default class StrategyManager {
 
 	_strategies = []
 	
@@ -16,9 +16,7 @@ export class StrategyManager {
 
 
 	getStrategiesNames() {
-		return [ ...this._strategies.reduce( function(a, b){
-			return b.name
-		}) ]
+		return [ ...this._strategies.map( o => o.name ) ]
 	}
 
 }

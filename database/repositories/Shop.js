@@ -1,8 +1,8 @@
-const { ShopModel } = require('../models/Shop')
-const { GoogleModelCollection } = require('../models/Google')
-const { HeurekaModelCollection } = require('../models/Heureka')
+import { ShopModel } from '../models/Shop.js'
+import { GoogleModelCollection } from '../models/Google.js'
+import { HeurekaModelCollection } from '../models/Heureka.js'
 
-module.exports = class ShopRepositoryFascade {
+export default class ShopRepositoryFascade {
 
 	async findShopById(id)
 	{
