@@ -1,15 +1,13 @@
-import express from "express"
+import Route from './_index.js'
 
-export default class CrawlerRoute {
+export default class CrawlerRoute extends Route {
 
-	_router = null
 	_startegymanager = null
 
 	constructor (startegyManager) {
-		this._router = express.Router()
-		this._startegymanager = startegyManager
+		super()
 
-		this.indexRoutes()
+		this._startegymanager = startegyManager
 	}
 
 	indexRoutes(){
@@ -26,9 +24,5 @@ export default class CrawlerRoute {
 			res.status(404)
 			res.send({ error: error })
 		}
-	}
-
-	getRouter() {
-		return this._router
 	}
 }

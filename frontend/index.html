@@ -32,7 +32,7 @@
 	<div class="container mx-auto">
 		<div class="flex flex-row mb-3 items-center">
 			<div class="mb-4">
-				<input x-model="title" x-ref="titleInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Title">
+				<input x-model="shopName" x-ref="shopNameInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Shop name">
 			</div>
 			<div class="mb-4 ml-5">
 				<select x-model="sourceType" x-ref="sourceTypeInput" required class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -48,9 +48,7 @@
 				</div>
 			</template>
 			<template x-if="getSourceType() == 'scraper'">
-
 				<div>
-
 					<div class="mb-4 ml-5">
 						<select x-model="scraper" x-ref="scraperInput" required class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
 							<option value="" disabled>Select Scraper</option>
@@ -195,31 +193,126 @@
 <script>
 	function crudAlpine(){
 		return {
-			initialize: function() {
-				this.shops = this.loadShops()
+			shops: [],
+			scrapers: [],
+			shopName: '',
+			sourceType: '',
+			scraperConfig: '',
+			scraper: '',
+			sourceURL: '',
+			initialize: async function() {
+				this.shops = await this.loadShops()
+				this.scrapers = await this.loadScrapers()
 			},
 			loadShops: async function() {
-				return new Promise(async (resolve, reject) => {
-					fetch(apis.shopsEndpointUrl)
-					.then(r => r.json())
-					.then((data) => {
-						return resolve(data)
-					}).catch(err =>{
-						return reject(err)
-					})
-				})
+				return await requestHandler(apis.shopsEndpointUrl, {})
+				.catch(err => console.log(err))
 			},
 			loadScrapers: async function() {
-				return new Promise(async (resolve, reject) => {
-					fetch(apis.shopsEndpointUrl)
-					.then(r => r.json())
-					.then((data) => {
-						return resolve(data)
-					}).catch(err =>{
-						return reject(err)
+				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
+				.catch(err => console.log(err))
+			},
+			deleteShop: async function(shop) {
+                return await requestHandler(`${apis.shopsEndpointUrl}/${shop._id}`, { method: 'DELETE' })
+			},
+			createShop: async function () {
+				let source_config = this.getSourceConfig()
+
+				if( source_config === null ){
+					return 0;
+				} 
+
+                return await requestHandler(apis.shopsEndpointUrl, { 
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						title: this.shopName,
+						source: {
+							source_type: this.sourceType,
+							source_config: source_config
+						}
 					})
 				})
-			}
+				.catch(err => console.log(err))
+			},
+			getSourceConfig: function() {
+				let source_config = null
+
+				if(this.getSourceType() == 'scraper'){
+					let scraper_links = this.scraperConfig.split(/\n/)
+					source_config = {
+						scraper_links: scraper_links,
+						scraper_name: this.scraper
+					}
+				}else if(this.getSourceType() == 'xml'){
+					source_config = {
+						source_url: this.sourceURL
+					}
+				}
+
+				return source_config
+			},
+			processShop: async function(shop, xml_type) {
+				this.toggleProccesing()
+				try {
+					this.innerText = 'Saving XML file'
+
+					let response = await requestHandler(`${apis.shopsEndpointUrl}/download_xml/${xml_type}/${shop._id}`, { method: 'GET' })
+					
+					console.log(response)
+					console.log('Request handled: ' + response.xml_filename)
+
+					let xml_file = response.xml_filename
+					this.innerText = 'Parsing XML file'
+
+					response = await requestHandler(`${apis.shopsEndpointUrl}/process/${shop._id}/${xml_type}/${xml_file}`, { method: 'GET' })
+					
+					this.toggleProccesing()
+					this.innerText = `Process ${capitalizeFirstLetter(xml_type)} XML`
+				}catch(error){
+					this.toggleProccesing()
+				}
+			},
+			getSourceType: function() {
+				if(['heureka', 'google'].includes(this.sourceType)){
+					return 'xml'
+				} else if (['scraper'].includes(this.sourceType)){
+					return 'scraper'
+				}
+				return null
+			},
+			getShopSourceType: function(shop) {
+				let sources = []
+
+				shop.sources.forEach(source => {
+					if(['heureka'].includes(source.source_type)){
+						sources.push('heureka')
+					} else if (['google'].includes(source.source_type)){
+						sources.push('google')
+					}
+				})
+				return sources
+			},
+			getSourcesString: function(shop) {
+				let sources = shop.sources
+				let sourcesStr = ""
+
+				sources.forEach(source => {
+					if(source.source_type == 'Scraper'){
+						sourcesStr +=  `[${source.source_type}]`
+					}else{
+						sourcesStr +=  `[${source.source_type} - ${source.cnt}]`
+					}
+
+				})
+
+				return sourcesStr
+			},
+			toggleProccesing: function(){
+				this.isProcessing = !this.isProcessing
+			},			
 		}
 	}
 </script>

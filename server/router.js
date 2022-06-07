@@ -11,7 +11,6 @@ export default class Router {
 		this._startegymanager = startegyManager
 	}
 
-
 	addRoutes() {
 		let shopRouter = new ShopRoute().getRouter()
 		let crawlerRouter = new CrawlerRoute(this._startegymanager).getRouter()

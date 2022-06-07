@@ -14,7 +14,6 @@ export default class StrategyManager {
 		return this._strategies.find(strategy => strategy.name === name)
 	}
 
-
 	getStrategiesNames() {
 		return [ ...this._strategies.map( o => o.name ) ]
 	}
