@@ -161,13 +161,25 @@
 	function crudAlpine(){
 		return {
 			catalogs: [],
+			scrapers: [],
+			catalogCounts: [],
 			initialize: async function() {	
 				console.log('Initializing')	
 
 				this.catalogs = await this.loadCatalogs()
+				this.scrapers = await this.loadScrapers()
+				this.catalogCounts = await this.loadCatalogCounts()
 			},
 			loadCatalogs: async function() {
 				return await requestHandler(apis.catalogsEndpointUrl, {})
+				.catch(err => console.log(err))
+			},
+			loadScrapers: async function() {
+				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
+				.catch(err => console.log(err))
+			},
+			loadCatalogCounts: async function() {
+				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
 				.catch(err => console.log(err))
 			},
 		}

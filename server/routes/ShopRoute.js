@@ -157,14 +157,9 @@ export default class ShopRoute extends Route {
 
 					this.shopRepository.storeProductsMany(model, products_save)
 		
-					//await saveProducts(products_save, model)
-		
 					products_save = []
-		
-					//await shop.save()
 				}
 			}, undefined)
-			//}))
 		
 			if(products_save.length){
 				this.shopRepository.storeProductsMany(model, products_save)

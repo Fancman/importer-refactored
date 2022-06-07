@@ -15,7 +15,6 @@ const CatalogModelCollection = async function(catalog_name){
 	return getMongoModel('catalog', CatalogSchema, catalog_name)
 }
 
-
 export {
 	CatalogModel,
 	CatalogModelCollection
