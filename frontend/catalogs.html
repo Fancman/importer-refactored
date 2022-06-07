@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="crudAlpine()" x-init="initialize">
+	<header class="text-center bg-blue-800 text-white p-4 mb-10">
+		<div class="text-3xl md:text-5xl mb-3 font-bold"><i class="fa fa-bolt mr-2"></i>Importer App</div>
+		<p>API by <a class="text-blue-300" href="#">Me</a></p>
+	</header>
+	<div class="container mx-auto">
+		<div class="flex flex-row mb-10 items-center">
+			<ul class="flex">
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="index.html">Shops</a>
+				</li>
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="catalogs.html">Catalogs</a>
+				</li>
+				<li class="mr-6">
+					<a class="text-blue-500 hover:text-blue-800" href="products.html">Products</a>
+				</li>
+				<li class="mr-6">
+					<button @click="initialize()" class="text-blue-500 hover:text-blue-800">Refresh</button>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container mx-auto">
+		<div class="flex flex-row mb-3 items-center">			
+			<div class="flex flex-row items-center">
+				<div class="mb-4">
+					<input x-model="catalogTitle" x-ref="catalogTitleInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Catalog Title">
+				</div>
+				<div class="mb-4 ml-5">
+					<input x-model="catalogURL" x-ref="catalogURLInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Catalog URL">
+				</div>
+				<div class="mb-4 ml-5">
+					<button @click="createCatalog()"
+						class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+						Add new catalog
+					</button>
+				</div>
+			</div>
+
+			<div class="flex flex-row items-center ml-6">
+				<div class="mb-4">
+					<select x-model="selectedCatalog" x-ref="selectedCatalogInput" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+						<option value="" disabled>Select Catalog</option>
+						<template x-for="catalog in catalogs" :key="catalog._id">
+							<option :value="catalog._id" x-text="catalog.title"></option>
+						</template>
+					</select>
+				</div>
+
+				<div class="mb-4 ml-5">					
+					<select x-model="selectedScraper" x-ref="selectedScraperInput" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+						<option value="" disabled>Select Scraper</option>
+						<template x-for="scraper in scrapers">
+							<option :value="scraper" x-text="scraper"></option>
+						</template>
+					</select>
+				</div>
+
+				<div class="ml-5 mb-3 xl:w-96">
+					<textarea x-model="scraperConfig" x-ref="scraperConfigInput"
+					class="
+						form-control
+						block
+						w-full
+						px-3
+						py-1.5
+						text-base
+						font-normal
+						text-gray-700
+						bg-white bg-clip-padding
+						border border-solid border-gray-300
+						rounded
+						transition
+						ease-in-out
+						m-0
+						focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
+					"
+					id="exampleFormControlTextarea1"
+					rows="3"
+					placeholder="Your message"
+					></textarea>
+				</div>
+
+				<div class="mb-4 ml-5">
+					<button @click="createScraperConfig()"
+						class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+						Add scraper
+					</button>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+
+	<div class="container mx-auto mt-5 mb-5">
+		<div class="grid grid-cols-3 gap-4">
+
+			<div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+				<template x-for="catalog in catalogs" :key="catalog._id">
+					<div class="px-6 py-4">
+						<div x-text="catalog.title" class="font-bold text-xl mb-2"></div>
+						<div x-text="catalog.url" class="text-sm mb-2"></div>
+						<h3 class="border-t mb-2 pt-3 font-semibold">Scrapers:</h3>
+						
+						<template x-for="scraper in catalog.scrapers" :key="scraper._id">
+							
+							<div class="mt-2 py-2 border-t">
+								<div class="flex justify-between">
+									<span x-text="scraper.name" class="flex py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"></span>
+									<div class="flex-col">
+										<template x-for="(statuses, scraper_name) in catalogCounts[catalog.slug]">
+											<template x-for="(count, status) in statuses">
+												<template x-if="scraper.name==scraper_name">
+													<span x-text="status + ': ' + count " class="block text-white rounded-full bg-orange-500 py-1 px-3 my-1 items-baseline"></span>
+												</template>													
+											</template>
+										</template>
+									</div>
+									<div class="flex flex-col">										
+										<button @click="scrapeProducts(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Scrape Products
+										</button>
+										<button @click="stopScrapingProducts(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Stop Scraping Products
+										</button>
+										<button @click="scrapeLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Scrape Links
+										</button>
+										<button @click="stopScrapingLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Stop Scraping Links
+										</button>
+										<button @click="downloadImages(catalog, scraper)" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Download Images
+										</button>
+									</div>
+								</div>
+							</div>
+						</template>
+						
+					</div>
+				</template>
+			</div>
+		  </div>
+	</div>
+</body>
+
+<script src="assets/main.js"></script>
+<script>
+	function crudAlpine(){
+		return {
+			catalogs: [],
+			initialize: async function() {	
+				console.log('Initializing')	
+
+				this.catalogs = await this.loadCatalogs()
+			},
+			loadCatalogs: async function() {
+				return await requestHandler(apis.catalogsEndpointUrl, {})
+				.catch(err => console.log(err))
+			},
+		}
+	}
+</script>
+
+</html>

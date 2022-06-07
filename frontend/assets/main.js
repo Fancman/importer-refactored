@@ -1,6 +1,6 @@
 
 const apis = {
-	//catalogsEndpointUrl: "http://localhost:4000/api/catalogs",
+	catalogsEndpointUrl: "http://localhost:4000/api/catalogs",
 	//productsEndpointUrl: "http://localhost:4000/api/products",
 	shopsEndpointUrl: "http://localhost:4000/api/shops",
 	crawlerEndpointUrl: "http://localhost:4000/api/crawler"
