@@ -15,4 +15,21 @@ export default class CatalogRepositoryFascade {
 		}
 	}
 
+	async storeCatalog(title, url)
+	{
+		try {
+			let model = await CatalogModel
+
+			let catalog = await model.create({
+				'title': title,
+				'url': url
+			}).exec();
+
+			return catalog
+		} 
+		catch (error) {
+			return null
+		}
+	}
+
 }

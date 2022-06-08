@@ -17,8 +17,16 @@ export default class ShopRoute extends Route {
 			this.getCatalogs(req, res, next)
 		})
 
+		this._router.post('/', async (req, res, next) => {
+			this.storeCatalog(req, res, next)
+		})
+
 		this._router.get('/counts', async (req, res, next) => {
 			this.getCatalogCounts(req, res, next)
+		})
+
+		this._router.patch('/scraper-config', async (req, res, next) => {
+			this.addScraperConfig(req, res, next)
 		})
 	}
 
@@ -37,9 +45,9 @@ export default class ShopRoute extends Route {
 
 	async getCatalogCounts(req, res, next){
 		try {
-			let catalogCounts = await this.productRepository.getCatalogStatusesCount()
+			let counts = await this.productRepository.getCatalogStatusesCount()
 
-			res.send(catalogCounts)
+			res.send(counts)
 
 		} catch (error) {
 			res.status(404)
@@ -47,6 +55,22 @@ export default class ShopRoute extends Route {
 		}
 	}
 
+	async storeCatalog(req, res, next){
+		
+		try {
+			let title = req.body.title
+			let url = req.body.url
+
+			let catalog = await this.catalogRepository.storeCatalog(title, url)
+
+			res.send(catalog)
+
+		} catch (error) {
+			res.status(404)
+			res.end(error.message)
+		}
+
+	}
 
 
 }

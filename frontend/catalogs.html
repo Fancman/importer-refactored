@@ -94,7 +94,7 @@
 				</div>
 
 				<div class="mb-4 ml-5">
-					<button @click="createScraperConfig()"
+					<button @click="addScraperConfig()"
 						class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
 						Add scraper
 					</button>
@@ -163,6 +163,11 @@
 			catalogs: [],
 			scrapers: [],
 			catalogCounts: [],
+			catalogTitle: '',
+			catalogURL: '',
+			selectedCatalog: '',
+			selectedScraper: '',
+			scraperConfig: '',
 			initialize: async function() {	
 				console.log('Initializing')	
 
@@ -179,9 +184,37 @@
 				.catch(err => console.log(err))
 			},
 			loadCatalogCounts: async function() {
-				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
+				return await requestHandler(`${apis.catalogsEndpointUrl}/counts`, {})
 				.catch(err => console.log(err))
 			},
+			createCatalog: async function() {
+				return await requestHandler(`${apis.catalogsEndpointUrl}/${this.selectedCatalog}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						title: this.catalogTitle,
+						url: this.catalogURL
+					})
+				})
+				.catch(err => console.log(err))
+			},
+			addScraperConfig: async function() {
+				let scraper_links = this.scraperConfig.split(/\n/)
+				
+				return await requestHandler(`${apis.catalogsEndpointUrl}/scraper-config`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						scraper: this.selectedScraper,
+						scraper_links: scraper_links
+					})
+				})
+				.catch(err => console.log(err))
+			}
 		}
 	}
 </script>
