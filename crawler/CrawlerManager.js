@@ -1,3 +1,5 @@
+import puppeteer from 'puppeteer'
+
 export default class CrawlerManager {
 
 	_crawlers = []
@@ -6,21 +8,12 @@ export default class CrawlerManager {
 		this.browser = null
 	}
 
-	async startAction(domainName, action){
-		let crawler = this.getCrawler(domainName, action)
+	async startAndGetTab(){
+		await this.setBrowser()
 
-		if( crawler === undefined ){
-			return null
-		}
-
-		this.setBrowser()
-
-		let tab = this.getPage()
+		let tab = await this.getPage()
 		
-
-		if(crawler){
-			crawler.startAction(tab)
-		}
+		return tab
 	}
 
 	async stopAction(domainName, action){
@@ -64,14 +57,19 @@ export default class CrawlerManager {
 	}
 
 	async startBrowser(){
-		let browser = await puppeteer.launch({
-			headless: true,
-			args: [
-				'--no-sandbox'
-			]
-		});
-	
-		return browser
+		return new Promise(async (resolve) => {
+			try {
+				let browser = await puppeteer.launch({
+					headless: true,
+					args: [
+						'--no-sandbox'
+					]
+				});
+				return resolve(browser)
+			} catch (error) {
+				return resolve(null)
+			}
+		})
 	}
 
 	async releaseBrowser(){

@@ -9,6 +9,16 @@ class Singleton {
         this.message = 'I am an instance';
     }
 
+	async sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+	
+	async getRandomInt(min, max) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min) + min);
+	}
+
 	async downloadFile(url, filename) {
 		return fs.writeFileSync(`storage/${filename}`, await download(url))
 	}

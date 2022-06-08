@@ -1,5 +1,7 @@
 import StrategyManager from "./StrategyManager.js"
 import RellecigaDomainStrategy from "./strategies/RellecigaDomainStrategy.js"
+import checkCrawlerActions from "./actions/index.js"
+import ActionBuilder from "./actions/ActionBuilder.js"
 
 export default class Crawler {
 
@@ -8,9 +10,12 @@ export default class Crawler {
 	_data = {}
 	_strategy = null
 
-	async startAction(tab) {
-		if( this.action === 'getLinksAndPagination' ){
-
+	async start() {
+		let actionName = checkCrawlerActions(this._data)
+		let actionCrawler = await ActionBuilder(this._strategy, this._data.scraper_links, this._tab, actionName)
+		
+		if( actionCrawler ){
+			await actionCrawler.start()
 		}
 	}
 
@@ -28,6 +33,10 @@ export default class Crawler {
 
 	getStrategy(){
 		return this._strategy
+	}
+
+	setTab(tab){
+		this._tab = tab
 	}
 }
 

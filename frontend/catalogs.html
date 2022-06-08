@@ -180,11 +180,26 @@
 				.catch(err => console.log(err))
 			},
 			loadScrapers: async function() {
-				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
+				return await requestHandler(`${apis.scrapersEndpointUrl}/scrapers`, {})
 				.catch(err => console.log(err))
 			},
 			loadCatalogCounts: async function() {
 				return await requestHandler(`${apis.catalogsEndpointUrl}/counts`, {})
+				.catch(err => console.log(err))
+			},
+			scrapeLinks: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/scrape-links`, options)
 				.catch(err => console.log(err))
 			},
 			createCatalog: async function() {

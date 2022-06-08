@@ -9,10 +9,11 @@ export default class Server {
 	_app = null
 	_strategymanager = null
 	
-	constructor(strategyManager) {
+	constructor(strategyManager, crawlerManager) {
 		this._app = express()
 		this._app.set("port", this.getPort())
 		this._strategymanager = strategyManager
+		this._crawlermanager = crawlerManager
 
 		this.configureMiddleware()
 		this.configureRoutes()
@@ -33,7 +34,7 @@ export default class Server {
 	}
 
 	configureRoutes() {
-		new Router(this._app, this._strategymanager).addRoutes()
+		new Router(this._app, this._strategymanager, this._crawlermanager).addRoutes()
 	}
 
 	start() {

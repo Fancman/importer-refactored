@@ -1,11 +1,11 @@
 export default class DomainStrategy {
 	constructor(){}
 
-	getLinksAndPagination(){
+	async getLinksAndPagination(){
 		console.log("Getting links and pagination")
 	}
 
-	parsePage(){
+	async parsePage(){
 		console.log("Parsing page")
 	}
 

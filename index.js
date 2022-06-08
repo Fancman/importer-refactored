@@ -1,5 +1,6 @@
 import Server from "./server/index.js"
-import StrategyManager from "./crawler/index.js"
+import StrategyManager from "./crawler/StrategyManager.js"
+import CrawlerManager from "./crawler/CrawlerManager.js"
 
 import RellecigaDomainStrategy from './crawler/strategies/RellecigaDomainStrategy.js'
 
@@ -9,12 +10,13 @@ import RellecigaDomainStrategy from './crawler/strategies/RellecigaDomainStrateg
 	crawler.startInspectingPages('relleciga.sk')*/
 
 	let strategyManager = new StrategyManager();
+	let crawlerManager = new CrawlerManager();
 
 	strategyManager.addStrategy(new RellecigaDomainStrategy())
 
 	//console.log(strategyManager.getStrategiesNames())
 
-	let server = new Server(strategyManager);
+	let server = new Server(strategyManager, crawlerManager);
 	
 	server.start();
 })();

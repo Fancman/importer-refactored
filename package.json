@@ -6,6 +6,7 @@
     "fs": "^0.0.1-security",
     "mongoose": "^6.3.5",
     "mongoose-paginate-v2": "^1.6.3",
+    "puppeteer": "^14.3.0",
     "slugify": "^1.6.5",
     "xml2js": "^0.4.23"
   },

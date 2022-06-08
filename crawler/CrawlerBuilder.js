@@ -10,13 +10,19 @@ export default class CrawlerBuilder {
 	
 	constructor(strategyManager, crawlerManager, data) {
 		this._crawler = new Crawler();
+		this._strategymanager = strategyManager
+		this._crawlermanager = crawlerManager
+		this._data = data
+	}
 
-		this.setAction(data)
-		this.setScraperDomain(data)
-		this.setCrawlerStrategy(strategyManager)
-		this.createStrategyCrawler(data)
-		this.addCrawlerToCrawlerManager(crawlerManager)
-		this.checkCrawlerInCrawlerManager(crawlerManager)
+	async init(){
+		this.setAction(this._data)
+		this.setScraperDomain(this._data)
+		this.setCrawlerStrategy(this._strategymanager)
+		this.createStrategyCrawler(this._data)
+		await this.addCrawlerToCrawlerManager(this._crawlermanager)
+		await this.checkCrawlerInCrawlerManager(this._crawlermanager)
+		await this.startTabForCrawler(this._crawlermanager)
 
 		return this._crawler
 	}
@@ -57,5 +63,10 @@ export default class CrawlerBuilder {
 		if( crawlerManagerObj === undefined ){
 			throw new Error("Crawler pre domenu a akciu nebol vytvoreny")
 		}
+	}
+
+	async startTabForCrawler(crawlerManager){
+		let tab = await crawlerManager.startAndGetTab()
+		this._crawler.setTab(tab)
 	}
 }

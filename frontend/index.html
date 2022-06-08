@@ -209,7 +209,7 @@
 				.catch(err => console.log(err))
 			},
 			loadScrapers: async function() {
-				return await requestHandler(`${apis.crawlerEndpointUrl}/scrapers`, {})
+				return await requestHandler(`${apis.scrapersEndpointUrl}/scrapers`, {})
 				.catch(err => console.log(err))
 			},
 			deleteShop: async function(shop) {
