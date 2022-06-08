@@ -138,7 +138,7 @@
 										<button @click="scrapeLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Scrape Links
 										</button>
-										<button @click="stopScrapingLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+										<button @click="stopScrapeLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Stop Scraping Links
 										</button>
 										<button @click="downloadImages(catalog, scraper)" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
@@ -200,6 +200,21 @@
 				}
 
 				return await requestHandler(`${apis.scrapersEndpointUrl}/scrape-links`, options)
+				.catch(err => console.log(err))
+			},
+			stopScrapeLinks: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/stop-scrape-links`, options)
 				.catch(err => console.log(err))
 			},
 			createCatalog: async function() {

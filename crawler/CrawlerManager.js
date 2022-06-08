@@ -3,9 +3,10 @@ import puppeteer from 'puppeteer'
 export default class CrawlerManager {
 
 	_crawlers = []
+	_browser = null
 
 	constructor(){		
-		this.browser = null
+		this._browser = null
 	}
 
 	async startAndGetTab(){
@@ -16,11 +17,20 @@ export default class CrawlerManager {
 		return tab
 	}
 
+	async startAction(domainName, action){
+		let crawler = this.getCrawler(domainName, action)
+
+		if(crawler) {
+			await crawler.start()
+			await this.removeCrawler(crawler)
+		}
+	}
+
 	async stopAction(domainName, action){
 		let crawler = this.getCrawler(domainName, action)
 
 		if(crawler) {
-			crawler.stopAction()
+			crawler.stop()
 		}
 	}
 
@@ -34,12 +44,33 @@ export default class CrawlerManager {
 		return crawler
 	}
 
+	async removeCrawler(crawler) {
+		for( var i = 0; i < this._crawlers.length; i++){ 
+    
+			if ( this._crawlers[i].hasOwnProperty('_data') ) { 
+		
+				if( this._crawlers[i]._data.scraper_name === crawler._data.scraper_name 
+					&&
+					this._crawlers[i]._data.action === crawler._data.action
+				) {
+					await this.releasePage(this._crawlers[i]._tab)
+
+					this._crawlers[i]._tab = null
+					
+					this._crawlers.splice(i, 1); 
+				}
+				
+			}
+		
+		}
+	}
+
 	getCrawler(domainName, action) {
 		return this._crawlers.find(crawler => crawler._data.scraper_name === domainName && crawler._data.action === action )
 	}
 
 	async getPage(){
-		return await this.browser.newPage();
+		return await this._browser.newPage();
 	}
 	  
 	async releasePage(page){
@@ -49,11 +80,11 @@ export default class CrawlerManager {
 	}
 
 	async setBrowser(){
-		if(this.browser === null){
-			this.browser = await this.startBrowser()
+		if(this._browser === null){
+			this._browser = await this.startBrowser()
 		}
 		
-		return this.browser
+		return this._browser
 	}
 
 	async startBrowser(){
@@ -72,9 +103,16 @@ export default class CrawlerManager {
 		})
 	}
 
+	async releaseBrowserNoneCrawlers(){
+		if( this._crawlers.length === 0 ){
+			await this.releaseBrowser();
+		}
+	}
+
 	async releaseBrowser(){
-		if(this.browser){
+		if( this.browser ){
 			await this.browser.close();
+			this.browser = null
 		}
 	}
 

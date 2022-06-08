@@ -2,6 +2,8 @@ import Utils from "../../utils/index.js"
 
 export default class PaginationCrawler {
 
+	_running = false
+
 	constructor(strategy, links, tab){
 		this._links = links
 		this._strategy = strategy
@@ -11,11 +13,19 @@ export default class PaginationCrawler {
 	async start(){
 		let fnc = this._strategy.getLinksAndPagination
 
+		this._running = true
+
 		for (let url of this._links) {
 			await this.crawlPagination(url, fnc)	
 		}
+		
+		this._running = false
 
 		return
+	}
+
+	async stop(){
+		this._running = false
 	}
 
 	async crawlPagination( starter_url, evaluateFnc ) {
@@ -26,6 +36,10 @@ export default class PaginationCrawler {
 		while( paginationLinks.length > 0 ){		
 
 			if(this._tab){
+
+				if ( this._running === false ){
+					break
+				}
 
 				let firstUrl = paginationLinks[0]
 				let result = await this.inspectPagination(evaluateFnc, firstUrl)

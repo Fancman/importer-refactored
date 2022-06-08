@@ -22,6 +22,10 @@ export default class ScraperRoute extends Route {
 		this._router.post('/scrape-links', async (req, res, next) => {
 			this.scrapePagination(req, res, next)
 		})
+
+		this._router.post('/stop-scrape-links', async (req, res, next) => {
+			this.stopScrapePagination(req, res, next)
+		})
 	}
 
 	async scrapePagination(req, res, next) {
@@ -41,11 +45,26 @@ export default class ScraperRoute extends Route {
 
 			let crawlerBuilderInstance = new CrawlerBuilder(this._startegymanager, this._crawlermanager, data)
 
-			let crawler = await crawlerBuilderInstance.init()
+			await crawlerBuilderInstance.init()
 
-			crawler.start()
+			this._crawlermanager.startAction(scraper_name, ACTION)
 
-			res.send('Crawling started')
+			return res.send('Crawling started')
+
+		} catch (error) {
+			res.status(404)
+			res.end(error.message)
+		}
+	}
+
+	async stopScrapePagination(req, res, next) {
+		try {
+			let ACTION = 'crawlPaginationAndCollectLinks'
+			let scraper_name = req.body.scraper.name
+
+			this._crawlermanager.stopAction(scraper_name, ACTION)
+
+			return res.send('Stopping crawling')
 
 		} catch (error) {
 			res.status(404)
