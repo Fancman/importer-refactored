@@ -1,6 +1,8 @@
 import StrategyCrawler from "./StrategyCrawler.js"
 import Crawler from './Crawler.js'
 
+import userAgent from 'user-agents'
+
 export default class CrawlerBuilder {
 
 	_action = null
@@ -67,6 +69,9 @@ export default class CrawlerBuilder {
 
 	async startTabForCrawler(crawlerManager){
 		let tab = await crawlerManager.startAndGetTab()
+
+		await tab.setUserAgent(userAgent.toString())
+
 		this._crawler.setTab(tab)
 	}
 }

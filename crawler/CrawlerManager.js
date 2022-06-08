@@ -1,4 +1,13 @@
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-extra'
+
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+
+import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker'
+
+
+puppeteer.use(StealthPlugin())
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
+
 
 export default class CrawlerManager {
 
@@ -18,7 +27,7 @@ export default class CrawlerManager {
 	}
 
 	async startAction(domainName, action){
-		let crawler = this.getCrawler(domainName, action)
+		let crawler = this.getCrawler(domainName, action)		
 
 		if(crawler) {
 			await crawler.start()
@@ -55,9 +64,15 @@ export default class CrawlerManager {
 				) {
 					await this.releasePage(this._crawlers[i]._tab)
 
+					console.log('Closed: ', this._crawlers[i]._tab.isClosed())
+
 					this._crawlers[i]._tab = null
 					
 					this._crawlers.splice(i, 1); 
+					
+					await this.releaseBrowserNoneCrawlers()
+
+					console.log(`Crawler stopped: ${crawler._data.scraper_name} ${crawler._data.action}`)
 				}
 				
 			}
@@ -70,7 +85,9 @@ export default class CrawlerManager {
 	}
 
 	async getPage(){
-		return await this._browser.newPage();
+		let tab = await this._browser.newPage();
+
+		return tab
 	}
 	  
 	async releasePage(page){
@@ -90,6 +107,7 @@ export default class CrawlerManager {
 	async startBrowser(){
 		return new Promise(async (resolve) => {
 			try {
+				
 				let browser = await puppeteer.launch({
 					headless: true,
 					args: [
@@ -110,9 +128,9 @@ export default class CrawlerManager {
 	}
 
 	async releaseBrowser(){
-		if( this.browser ){
-			await this.browser.close();
-			this.browser = null
+		if( this._browser ){
+			await this._browser.close();
+			this._browser = null
 		}
 	}
 

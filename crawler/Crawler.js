@@ -12,9 +12,9 @@ export default class Crawler {
 	_actioncrawler = null
 
 	async start() {
-		let actionName = checkCrawlerActions(this._data)
+		let actionName = await checkCrawlerActions(this._data)
 
-		this._actioncrawler = await ActionBuilder(this._strategy, this._data.scraper_links, this._tab, actionName)
+		this._actioncrawler = await ActionBuilder(this._strategy, this._data, this._tab, actionName)
 
 		if( this._actioncrawler ){
 			await this._actioncrawler.start()			

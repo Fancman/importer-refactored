@@ -3,11 +3,11 @@ class ActionCheck {
 		return false
 	}
 
-	checkAndContinue(data){
-		let checkResult = this.check(data)
+	async checkAndContinue(data){
+		let checkResult = await this.check(data)
 
 		if( checkResult === false && this._next ){
-			this._next.checkAndContinue(data)
+			return await this._next.checkAndContinue(data)
 		}
 
 		return checkResult
@@ -47,7 +47,7 @@ class InspectLinksActionCheck extends ActionCheck {
 			return false
 		}
 
-		return 'NotPaginationCrawler'
+		return 'LinksInspectorCrawler'
 	}
 	
 }
@@ -58,5 +58,7 @@ export default function checkCrawlerActions(data){
 
 	crawlPaginationActionCheck.setNext(inspectLinksActionCheck);
 
-	return crawlPaginationActionCheck.checkAndContinue(data);
+	let result = crawlPaginationActionCheck.checkAndContinue(data);
+
+	return result
 }

@@ -1,11 +1,13 @@
 import Utils from "../../utils/index.js"
 
+import myService from "../../database/Observer.js"
+
 export default class PaginationCrawler {
 
 	_running = false
 
-	constructor(strategy, links, tab){
-		this._links = links
+	constructor(strategy, data, tab){
+		this._data = data
 		this._strategy = strategy
 		this._tab = tab
 	}
@@ -15,7 +17,7 @@ export default class PaginationCrawler {
 
 		this._running = true
 
-		for (let url of this._links) {
+		for (let url of this._data.scraper_links) {
 			await this.crawlPagination(url, fnc)	
 		}
 		
@@ -55,11 +57,11 @@ export default class PaginationCrawler {
 					let links = result.response.links
 					let paginations = result.response.paginations
 
-					/*eventEmitter.emit('save_links', {
-						scraper_name: scraper_name,
+					myService.emit('save_product_links', {
+						scraper_name: this._data.scraper_name,
 						links: links,
-						catalog_slug: catalog_slug,
-					});*/
+						catalog_slug: this._data.catalog_slug,
+					})
 
 					for(const pagination_link of paginations){
 						if( ! visitedPaginationLinks.includes(pagination_link)){
@@ -74,9 +76,6 @@ export default class PaginationCrawler {
 			}
 
 		}
-	//await page.setUserAgent(userAgent.toString())
-
-	//await this._strategy.getLinksAndPagination(link)
 	}
 
 	async inspectPagination(evaluateFnc, url){	

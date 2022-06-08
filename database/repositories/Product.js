@@ -1,5 +1,6 @@
 //import { CatalogModel } from '../models/Catalog.js'
 import { ProductModelCollection } from '../models/Product.js'
+
 import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 
 export default class ProductRepositoryFascade {
@@ -9,6 +10,19 @@ export default class ProductRepositoryFascade {
 			let model = await ProductModelCollection(`catalog_products_${catalogSlug}`)
 			
 			return model
+		} catch (error) {
+			return null
+		}
+	}
+
+	async getProductsWithNoneStatus(catalogSlug, criteria){
+		try {
+			let model = await this.getModelByCatalogSlug(catalogSlug)
+
+			let products = await model.find(criteria).exec();
+
+			return products
+
 		} catch (error) {
 			return null
 		}

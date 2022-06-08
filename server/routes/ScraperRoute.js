@@ -2,6 +2,8 @@ import Route from './_index.js'
 //import StrategyCrawler from '../../crawler/StrategyCrawler.js'
 import CrawlerBuilder from '../../crawler/CrawlerBuilder.js'
 
+import ProductRepositoryFascade from "../../database/repositories/Product.js"
+
 export default class ScraperRoute extends Route {
 
 	_startegymanager = null
@@ -9,6 +11,8 @@ export default class ScraperRoute extends Route {
 
 	constructor (startegyManager, crawlerManager) {
 		super()
+
+		this.productRepository = new ProductRepositoryFascade()
 
 		this._startegymanager = startegyManager
 		this._crawlermanager = crawlerManager
@@ -26,6 +30,10 @@ export default class ScraperRoute extends Route {
 		this._router.post('/stop-scrape-links', async (req, res, next) => {
 			this.stopScrapePagination(req, res, next)
 		})
+
+		this._router.post('/scrape-products', async (req, res, next) => {
+			this.scrapeProducts(req, res, next)
+		})
 	}
 
 	async scrapePagination(req, res, next) {
@@ -40,6 +48,39 @@ export default class ScraperRoute extends Route {
 				action: ACTION,
 				catalog_slug: catalog_slug,
 				scraper_links: scraper_links,
+				scraper_name: scraper_name
+			}
+
+			let crawlerBuilderInstance = new CrawlerBuilder(this._startegymanager, this._crawlermanager, data)
+
+			await crawlerBuilderInstance.init()
+
+			this._crawlermanager.startAction(scraper_name, ACTION)
+
+			return res.send('Crawling started')
+
+		} catch (error) {
+			res.status(404)
+			res.end(error.message)
+		}
+	}
+
+	async scrapeProducts(req, res, next) {
+		try {
+			let ACTION = 'inspectLinksAndStoreData'
+
+			let catalog_slug = req.body.catalog.slug
+			let scraper_name = req.body.scraper.name
+			
+			let product_links = await this.productRepository.getProductsWithNoneStatus(catalog_slug, {
+				scraper_name: scraper_name,
+				status: 'none'
+			})
+
+			let data = {
+				action: ACTION,
+				catalog_slug: catalog_slug,
+				product_links: product_links,
 				scraper_name: scraper_name
 			}
 

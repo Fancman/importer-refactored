@@ -187,6 +187,21 @@
 				return await requestHandler(`${apis.catalogsEndpointUrl}/counts`, {})
 				.catch(err => console.log(err))
 			},
+			scrapeProducts: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/scrape-products`, options)
+				.catch(err => console.log(err))
+			},
 			scrapeLinks: async function(catalog, scraper){
 				let options = {
 					method: 'POST',

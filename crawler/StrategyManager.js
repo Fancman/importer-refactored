@@ -11,7 +11,7 @@ export default class StrategyManager {
 	}
 
 	getStrategy(name) {
-		return this._strategies.find(strategy => strategy.name === name)
+		return this._strategies.find( strategy => strategy.name === name )
 	}
 
 	getStrategiesNames() {
