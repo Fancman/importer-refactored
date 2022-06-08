@@ -1,7 +1,15 @@
 export default class DomainStrategy {
 	constructor(){}
 
-	getLinksAndPagination(){}
+	getLinksAndPagination(){
+		console.log("Getting links and pagination")
+	}
 
-	parsePage(){}
+	parsePage(){
+		console.log("Parsing page")
+	}
+
+	getName(){
+		return this.name
+	}
 }
