@@ -1,11 +1,11 @@
 import GoogleSchema from '../schemas/Google.js'
 
-import { getMongoModel } from '../index.js'
+import { MongoDatabase } from '../index.js'
 
-let GoogleModel = getMongoModel('google_product', GoogleSchema)
+let GoogleModel = MongoDatabase('google_product', GoogleSchema)
 
 const GoogleModelCollection = async function(catalog_name){
-	return getMongoModel('google_product', GoogleSchema, catalog_name)
+	return MongoDatabase('google_product', GoogleSchema, catalog_name)
 }
 
 export {

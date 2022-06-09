@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-var datastoreModel = {
+var Database = {
     process: function () {
         this.connect();
 
@@ -17,8 +17,8 @@ function inherit(proto) {
 }
 
 
-function getMongoModel(modelName, modelSchema, collectionName) {
-    var mongodb = inherit(datastoreModel);
+function MongoDatabase(modelName, modelSchema, collectionName) {
+    var mongodb = inherit(Database);
 
     mongodb.connect = async function () {
 
@@ -45,5 +45,5 @@ function getMongoModel(modelName, modelSchema, collectionName) {
 
 
 export {
-	getMongoModel
+	MongoDatabase
 }

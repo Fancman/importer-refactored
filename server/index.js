@@ -8,6 +8,7 @@ export default class Server {
 	_server = null
 	_app = null
 	_strategymanager = null
+	_crawlermanager = null
 	
 	constructor(strategyManager, crawlerManager) {
 		this._app = express()

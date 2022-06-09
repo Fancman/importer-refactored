@@ -1,5 +1,5 @@
 import Route from './_index.js'
-//import StrategyCrawler from '../../crawler/StrategyCrawler.js'
+
 import CrawlerBuilder from '../../crawler/CrawlerBuilder.js'
 
 import ProductRepositoryFascade from "../../database/repositories/Product.js"

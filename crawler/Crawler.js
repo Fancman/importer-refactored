@@ -1,5 +1,3 @@
-import StrategyManager from "./StrategyManager.js"
-import RellecigaDomainStrategy from "./strategies/RellecigaDomainStrategy.js"
 import checkCrawlerActions from "./actions/index.js"
 import ActionBuilder from "./actions/ActionBuilder.js"
 

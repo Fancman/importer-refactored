@@ -7,6 +7,7 @@ export default class Router {
 
 	_app = null
 	_startegymanager = null
+	_crawlerManager = null
 
 	constructor (app, startegyManager,crawlerManager) {		
 		this._app = app

@@ -1,6 +1,4 @@
-import Utils from "../../utils/index.js"
-
-import myService from "../../database/Observer.js"
+import EventsObserver from "../../database/Observer.js"
 
 export default class LinksInspectorCrawler {
 
@@ -46,7 +44,7 @@ export default class LinksInspectorCrawler {
 
 					let result = await this.inspectPage(evaluateFnc, url)
 
-					eventEmitter.emit('save_link_data', {
+					EventsObserver.emit('save_link_data', {
 						scraper_name: this._data.scraper_name,
 						url: url,
 						id: id,

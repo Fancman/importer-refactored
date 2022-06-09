@@ -2,7 +2,7 @@ import slugify from 'slugify';
 
 import ShopSchema from '../schemas/Shop.js'
 
-import { getMongoModel } from '../index.js'
+import { MongoDatabase } from '../index.js'
 
 ShopSchema.pre('save', async function(next) {
 	this.slug = slugify(this.title)
@@ -22,7 +22,7 @@ ShopSchema.pre('save', async function(next) {
 	next();
 });
 
-let ShopModel = getMongoModel('shop', ShopSchema)
+let ShopModel = MongoDatabase('shop', ShopSchema)
 
 export {
 	ShopModel

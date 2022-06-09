@@ -1,6 +1,6 @@
 import Utils from "../../utils/index.js"
 
-import myService from "../../database/Observer.js"
+import EventsObserver from "../../database/Observer.js"
 
 export default class PaginationCrawler {
 
@@ -57,7 +57,7 @@ export default class PaginationCrawler {
 					let links = result.response.links
 					let paginations = result.response.paginations
 
-					myService.emit('save_product_links', {
+					EventsObserver.emit('save_product_links', {
 						scraper_name: this._data.scraper_name,
 						links: links,
 						catalog_slug: this._data.catalog_slug,

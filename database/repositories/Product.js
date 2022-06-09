@@ -15,6 +15,98 @@ export default class ProductRepositoryFascade {
 		}
 	}
 
+	async findOne(Model, record) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let doc = Model.findOne(record)
+				return resolve(doc)
+			} catch (error) {
+				return reject(error)
+			}
+		})
+	}
+
+	async insertRecord(Model, record) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let doc = Model.create(record)
+				return resolve(doc)
+			} catch (error) {
+				return reject(error)
+			}
+		})
+	}
+
+	async storeLinks(data) {
+		let { scraper_name, links, catalog_slug } = data
+
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		for(const link of links){
+
+			try {
+				let product = await this.findOne(model, {url: link})
+	
+				if( product !== null ){
+					continue
+				}
+		
+				let productObj = {
+					url: link,
+					scraper_name: scraper_name,
+				}
+		
+				await this.insertRecord(model, productObj)
+
+			} catch (error) {
+				return null
+			}
+		}
+	}
+
+	async storeProduct(data) {
+		try {
+			let { response, id, catalog_slug } = data
+			let record = {}
+	
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+	
+			for (const [field_name, field_value] of Object.entries(response)) {
+				
+				if (field_name === 'errors') {
+					continue;
+				}
+		
+				record[field_name] = field_value
+			}
+	
+			record.status = 'scraped'
+	
+			let product = await this.findUpdateById(model, {
+				$set: record
+			}, id)
+	
+			return product
+
+		} catch (error) {
+			return null
+		}
+	
+	}
+
+	async findUpdateById(Model, record, id) {
+		return new Promise(async (resolve, reject) => {
+			 Model.findByIdAndUpdate(id, record, function(err, doc) {
+	
+				if(err){
+					reject(err)
+				}
+	
+				resolve(doc)
+			})
+		})
+	}
+
 	async getProductsWithNoneStatus(catalogSlug, criteria){
 		try {
 			let model = await this.getModelByCatalogSlug(catalogSlug)
