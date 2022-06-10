@@ -217,6 +217,21 @@
 				return await requestHandler(`${apis.scrapersEndpointUrl}/scrape-links`, options)
 				.catch(err => console.log(err))
 			},
+			stopScrapingProducts: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/stop-scrape-links`, options)
+				.catch(err => console.log(err))
+			}, 
 			stopScrapeLinks: async function(catalog, scraper){
 				let options = {
 					method: 'POST',
