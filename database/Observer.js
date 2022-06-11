@@ -4,10 +4,12 @@ import ProductRepositoryFascade from './repositories/Product.js'
 
 class EventsObserver extends EventEmitter {
 
-	_data = {}
+	_data
 	
 	constructor() {
 		super()
+
+		this._data = {}
 
 		this.productRepositoryFascade = new ProductRepositoryFascade()
 

@@ -2,9 +2,10 @@ import express from "express"
 
 export default class Route {
 
-	_router = null
+	_router
 
 	constructor () {
+		this._router = null
 		this._router = express.Router()
 		this.indexRoutes()
 	}

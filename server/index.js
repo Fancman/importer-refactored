@@ -5,12 +5,13 @@ import Router from "./router.js"
 
 export default class Server {
 
-	_server = null
-	_app = null
-	_strategymanager = null
-	_crawlermanager = null
+	_server
+	_app
+	_strategymanager
+	_crawlermanager
 	
 	constructor(strategyManager, crawlerManager) {
+		this._server = null
 		this._app = express()
 		this._app.set("port", this.getPort())
 		this._strategymanager = strategyManager

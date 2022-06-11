@@ -138,7 +138,7 @@ export default class ProductRepositoryFascade {
 
 	async findUpdateById(Model, record, id) {
 		return new Promise(async (resolve, reject) => {
-			 Model.findByIdAndUpdate(id, record, function(err, doc) {
+			 Model.findByIdAndUpdate(id, record, (err, doc) => {
 	
 				if(err){
 					reject(err)

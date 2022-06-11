@@ -117,7 +117,7 @@ export default class ShopRepositoryFascade {
 		return model
 	}
 
-	async findAllLeanShopsWithCounts(shops){
+	async findAllLeanShopsWithCounts( shops ){
 		for (const [index, shop] of shops.entries()) {
 
 			if(shop.sources.length){
@@ -150,7 +150,7 @@ export default class ShopRepositoryFascade {
 				return resolve(0);
 			}
 			
-			Model.count({}, function(err, count) {
+			Model.count({}, (err, count) => {
 				return resolve(count)
 			});
 		})
@@ -159,7 +159,7 @@ export default class ShopRepositoryFascade {
 	async findProductBySku(Model, sku) {
 		return new Promise(async (resolve) => {
 			try {
-				Model.findOne({sku: sku}).then(function(product){
+				Model.findOne({sku: sku}).then( (product) => {
 					return resolve(product)
 				})
 			} catch (error) {
@@ -171,7 +171,7 @@ export default class ShopRepositoryFascade {
 	async storeProductsMany(Model, products){
 		return new Promise(async (resolve) => {
 			try {
-				await Model.insertMany(products).then( function(docs){
+				await Model.insertMany(products).then( (docs) => {
 					resolve(docs)
 				})
 			} catch (error) {

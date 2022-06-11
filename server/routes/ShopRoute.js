@@ -131,11 +131,11 @@ export default class ShopRoute extends Route {
 
 			let model = await this.shopRepository.getSourceTypeModel(source_type, collection_name)
 
-			await products_chunks.reduce(async (memo, products) => {
+			await products_chunks.reduce(async (memo, productsBatch) => {
 
 				await memo
 		
-				await Promise.all(products.map(async (product) => {
+				await Promise.all( productsBatch.map(async (product) => {
 					let sku = product['sku']
 
 					let existingProduct = await this.shopRepository.findProductBySku(model, sku)

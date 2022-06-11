@@ -6,11 +6,14 @@ import ProductRepositoryFascade from "../../database/repositories/Product.js"
 
 export default class ScraperRoute extends Route {
 
-	_startegymanager = null
-	_crawlermanager = null
+	_startegymanager
+	_crawlermanager
 
 	constructor (startegyManager, crawlerManager) {
 		super()
+
+		this._startegymanager = null
+		this._crawlermanager = null
 
 		this.productRepository = new ProductRepositoryFascade()
 

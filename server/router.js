@@ -5,9 +5,9 @@ import ScraperRoute from "./routes/ScraperRoute.js"
 
 export default class Router {
 
-	_app = null
-	_startegymanager = null
-	_crawlerManager = null
+	_app
+	_startegymanager
+	_crawlerManager
 
 	constructor (app, startegyManager,crawlerManager) {		
 		this._app = app

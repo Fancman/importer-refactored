@@ -52,7 +52,7 @@ class Singleton {
 
 			let parser = new xml2js.Parser({ attrkey: "ATTR" })
 	
-			parser.parseString(xml_string, async function(error, result) {
+			parser.parseString(xml_string, async (error, result) => {
 				if(error === null) {
 					let items = null
 					let catalog_type = null
