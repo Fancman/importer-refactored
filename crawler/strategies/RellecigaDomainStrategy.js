@@ -3,6 +3,11 @@ import DomainStrategy from './index.js'
 export default class RellecigaDomainStrategy extends DomainStrategy {
 	name = 'relleciga.sk'
 
+	_mandatoryFields = [
+		'title',
+		['price', 'sale_price'],
+	]
+
 	constructor(){
 		super()
 	}
@@ -45,8 +50,14 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 				},
 				'price' : function(){
 					let elm = document.querySelector('#content #product .price span.price-old span#price_new_ajaxx')
-		
-					if(elm){
+							
+					if( elm ){
+						return elm.textContent
+					}
+
+					elm = document.querySelector('#content #product .price span.price-normal span#price_new_ajaxx')
+
+					if( elm ){
 						return elm.textContent
 					}
 				},
@@ -64,14 +75,23 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 						return elm.href
 					}
 				},
-				'attr.sizes' : function(){
-					let elms = [... document.querySelectorAll('#content #product div#input-option4145 span')]
-				
-					let sizes = elms.map(function(elm){
-						return elm.textContent
+				'attr.sizes' : function(){				
+
+					let sizes = []
+
+					let elms = [... document.querySelectorAll('#product .form-group')]
+
+					elms.forEach( optionBox => {
+						if ( optionBox.textContent.includes('Veľkosť') ) {
+							let sizesElms = optionBox.querySelectorAll('div.radio label span')
+
+							sizesElms.forEach( sizesElm => {
+								sizes.push(sizesElm.textContent)
+							})
+						}
 					})
-	
-					return sizes.filter(size => size !== undefined);
+
+					return sizes
 				},
 				'description' : function(){
 					let selectors = [
@@ -94,7 +114,7 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 			}
 	
 			let outputData = {
-				errors: []
+				fieldErrors: []
 			}
 	
 			for (const [field, fnc] of Object.entries(output)) {
@@ -102,6 +122,7 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 					let fieldValue = fnc()
 					
 					outputData[field] = fieldValue
+
 				} catch (error) {
 					outputData.errors.push(
 						{
@@ -116,4 +137,5 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 			
 		});
 	}
+	
 }

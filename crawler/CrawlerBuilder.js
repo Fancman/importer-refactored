@@ -22,6 +22,7 @@ export default class CrawlerBuilder {
 		this.setScraperDomain(this._data)
 		this.setCrawlerStrategy(this._strategymanager)
 		this.createStrategyCrawler(this._data)
+		
 		await this.addCrawlerToCrawlerManager(this._crawlermanager)
 		await this.checkCrawlerInCrawlerManager(this._crawlermanager)
 		await this.startTabForCrawler(this._crawlermanager)

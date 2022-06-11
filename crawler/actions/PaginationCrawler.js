@@ -44,6 +44,9 @@ export default class PaginationCrawler {
 				}
 
 				let firstUrl = paginationLinks[0]
+
+				console.log(`Inspcting pagination url: ${firstUrl}`)
+
 				let result = await this.inspectPagination(evaluateFnc, firstUrl)
 				let randomInt = utils.getRandomInt(1500, 5000)
 

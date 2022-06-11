@@ -9,17 +9,38 @@ class Singleton {
         this.message = 'I am an instance';
     }
 
-	async sleep(ms) {
+	async sleep (ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
+
+	extractPrice (priceStr) {
+		if(priceStr === null || priceStr === undefined){
+			return null
+		}
 	
-	async getRandomInt(min, max) {
+		let numbers = priceStr.match(/\d+(?:\,\d+)?/g)
+	
+		if( numbers.length ){
+			return numbers[0]
+		}
+	
+		return null
+	}
+
+	clearText (str) {
+		str = str.replace(/(\r\n\t|\n|\r\t)/gm, "")
+		str = str.replace(/\s\s+/g, ' ')
+		str = str.trim()
+		return str
+	}
+	
+	async getRandomInt (min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min) + min);
 	}
 
-	async downloadFile(url, filename) {
+	async downloadFile (url, filename) {
 		return fs.writeFileSync(`storage/${filename}`, await download(url))
 	}
 

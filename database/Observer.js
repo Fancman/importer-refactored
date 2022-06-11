@@ -3,10 +3,14 @@ import { EventEmitter } from 'events'
 import ProductRepositoryFascade from './repositories/Product.js'
 
 class EventsObserver extends EventEmitter {
+
+	_data = {}
+	
 	constructor() {
 		super()
 
 		this.productRepositoryFascade = new ProductRepositoryFascade()
+
 		this.init()
 	}
 
@@ -18,8 +22,13 @@ class EventsObserver extends EventEmitter {
 
 		this.on('save_link_data', async (data) => {
 			console.log("save_link_data event")	
-			this.productRepositoryFascade.storeProduct(data)		
+			this.productRepositoryFascade.storeProduct(data)
+				
+			/*setImmediate(async () => {
+				let product = await this.productRepositoryFascade.storeProduct(data)
+			})*/
 		})
+		
 	}
 }
 

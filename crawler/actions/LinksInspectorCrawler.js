@@ -11,11 +11,13 @@ export default class LinksInspectorCrawler {
 	}
 
 	async start(){
-		let fnc = this._strategy.parsePage
+		let parsePageFnc = this._strategy.parsePage
+		let cleanParsedData = this._strategy.cleanParsedData
+		let checkDataFnc = this._strategy.checkData
 
 		this._running = true
 
-		await this.crawlPages(fnc)
+		await this.crawlPages(parsePageFnc, cleanParsedData, checkDataFnc)
 		
 		this._running = false
 
@@ -27,7 +29,7 @@ export default class LinksInspectorCrawler {
 	}
 
 
-	async crawlPages( evaluateFnc ) {
+	async crawlPages( parsePageFnc, cleanParsedData, checkDataFnc ) {
 		for (let product of this._data.product_links) {	
 
 			let url = product.url
@@ -42,15 +44,25 @@ export default class LinksInspectorCrawler {
 						break
 					}
 
-					let result = await this.inspectPage(evaluateFnc, url)
+					let result = await this.inspectPage(parsePageFnc, url)
 
-					EventsObserver.emit('save_link_data', {
-						scraper_name: this._data.scraper_name,
-						url: url,
-						id: id,
-						response: result.response,
-						catalog_slug: this._data.catalog_slug,
-					});
+					result = await cleanParsedData( result )
+
+					let checkResponseDataResult = await checkDataFnc( result )
+
+					if ( checkResponseDataResult === 1 ) {
+						EventsObserver.emit('save_link_data', {
+							scraper_name: this._data.scraper_name,
+							url: url,
+							id: id,
+							response: result.response,
+							catalog_slug: this._data.catalog_slug,
+						});
+					} else {
+						console.log( 'Something wrong happend' )
+					}
+
+					
 				}
 			} catch (error) {
 				console.log(error)
@@ -63,15 +75,32 @@ export default class LinksInspectorCrawler {
 		let urlObject = {
 			response: null,
 			error: null,
+			code: null,
 		}
 	
 		try {
-			const response = await this._tab.goto(url, { waitUntil: 'networkidle2' })
-			
+
+			await this._tab.setRequestInterception(true)
+
+			const [response] = await Promise.all([
+				this._tab.waitForResponse(res => res.url() === url, {timeout: 90000}),
+				this._tab.goto(url, { waitUntil: 'networkidle2' })
+			]);
+
+			/*console.log(await res.json());
+
+			await this._tab.goto(url, { waitUntil: 'networkidle2' })
+
+			let response = await this._tab.waitForResponse(response => response)*/
+
+			urlObject.code = await response.status()
+
 			urlObject.response = await evaluateFnc(this._tab)
 
 		} catch (error) {
-			urlObject.error = error			
+
+			urlObject.error = error	
+
 		} finally {
 			return urlObject
 		}

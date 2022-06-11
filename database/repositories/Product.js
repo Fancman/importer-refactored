@@ -42,12 +42,18 @@ export default class ProductRepositoryFascade {
 
 		let model = await this.getModelByCatalogSlug(catalog_slug)
 
-		for(const link of links){
+		let totalNumberOfLinks = links.length
+		let alreadySavedLinks = 0
+		let savedLinks = 0
+
+		for ( const link of links ) {
 
 			try {
 				let product = await this.findOne(model, {url: link})
 	
 				if( product !== null ){
+					alreadySavedLinks++
+
 					continue
 				}
 		
@@ -58,9 +64,18 @@ export default class ProductRepositoryFascade {
 		
 				await this.insertRecord(model, productObj)
 
+				savedLinks++
+
 			} catch (error) {
 				return null
 			}
+			
+		}
+
+		console.log(`Pagination links - Already saved: ${alreadySavedLinks}`, `Saved: ${savedLinks}`, `Total: ${totalNumberOfLinks}`)
+
+		return {
+			alr
 		}
 	}
 
