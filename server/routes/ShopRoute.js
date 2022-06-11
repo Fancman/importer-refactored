@@ -52,7 +52,7 @@ export default class ShopRoute extends Route {
 			let shop = await this.shopRepository.findShopByTitle(title)
 	
 			if( shop ){
-				let sources = existingShop.sources
+				let sources = shop.sources
 				let updated = false
 	
 				sources.forEach((source, index) => {
