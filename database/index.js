@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-var Database = {
+let Database = {
     process: function () {
         this.connect();
 
@@ -18,7 +18,7 @@ function inherit(proto) {
 
 
 function MongoDatabase(modelName, modelSchema, collectionName) {
-    var mongodb = inherit(Database);
+    let mongodb = inherit(Database);
 
     mongodb.connect = async function () {
 
@@ -33,7 +33,7 @@ function MongoDatabase(modelName, modelSchema, collectionName) {
 
     mongodb.getModel = async function () {
 
-		if(collectionName !== undefined){
+		if( typeof collectionName !== 'undefined' ) {
 			return mongoose.model(modelName, modelSchema, collectionName)
 		}
         

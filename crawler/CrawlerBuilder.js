@@ -41,7 +41,7 @@ export default class CrawlerBuilder {
 	setCrawlerStrategy(strategyManager){
 		let strategy = strategyManager.getStrategy(this._scraperdomain)
 
-		if( strategy === null || strategy === undefined ){
+		if( strategy === null || typeof strategy === 'undefined' ){
 			throw new Error("Strategia pre domenu neexistuje")
 		}
 
@@ -63,7 +63,7 @@ export default class CrawlerBuilder {
 	async checkCrawlerInCrawlerManager(crawlerManager){
 		let crawlerManagerObj = await crawlerManager.getCrawler(this._scraperdomain, this._action)
 
-		if( crawlerManagerObj === undefined ){
+		if( typeof crawlerManagerObj === 'undefined' ){
 			throw new Error("Crawler pre domenu a akciu nebol vytvoreny")
 		}
 	}

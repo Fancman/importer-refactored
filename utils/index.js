@@ -14,7 +14,7 @@ class Singleton {
 	}
 
 	static extractPrice (priceStr) {
-		if(priceStr === null || priceStr === undefined){
+		if(priceStr === null || typeof priceStr === 'undefined'){
 			return null
 		}
 	

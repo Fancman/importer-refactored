@@ -115,7 +115,7 @@ export default class ShopRoute extends Route {
 
 			let shop = await this.shopRepository.findShopById(id)
 
-			if(shop === undefined){
+			if ( typeof shop === 'undefined') {
 				res.status(404)
 				return res.end({ error: "Shop does not exist!"})
 			}

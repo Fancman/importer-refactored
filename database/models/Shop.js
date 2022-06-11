@@ -7,7 +7,7 @@ import { MongoDatabase } from '../index.js'
 ShopSchema.pre('save', async function( next ) {
 	this.slug = slugify(this.title)
 
-	if( this.sources !== undefined && this.sources.length > 0 ){
+	if( typeof this.sources !== 'undefined' && this.sources.length > 0 ){
 
 		if( this.sources.length ) {
 			this.sources.forEach((source, index) => {
