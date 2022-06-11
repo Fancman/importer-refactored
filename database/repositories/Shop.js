@@ -10,7 +10,7 @@ export default class ShopRepositoryFascade {
 		let sourceURL = null
 	
 		sources.forEach(source => {
-			if(source_type == source.source_type){
+			if(source_type === source.source_type){
 				sourceURL = source.source_config.source_url
 			}
 		})
@@ -107,10 +107,10 @@ export default class ShopRepositoryFascade {
 	async getSourceTypeModel(sourceType, sourceCollection){
 		let model = null
 
-		if(sourceType == 'google'){
+		if(sourceType === 'google'){
 			model = await GoogleModelCollection(sourceCollection)
 		}
-		else if (sourceType == 'heureka'){
+		else if (sourceType === 'heureka'){
 			model = await HeurekaModelCollection(sourceCollection)
 		}
 

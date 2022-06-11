@@ -56,7 +56,7 @@ export default class ShopRoute extends Route {
 				let updated = false
 	
 				sources.forEach((source, index) => {
-					if(source_type == source.source_type){
+					if(source_type === source.source_type){
 						sources[index]['source_config'] = source_config
 						updated = true
 					}
@@ -102,7 +102,7 @@ export default class ShopRoute extends Route {
 
 			let products = response['products']
 
-			if(products == undefined){
+			if(products === undefined){
 				res.status(404)
 				return res.end({ error: "Products don't exist!"})
 			}
@@ -115,7 +115,7 @@ export default class ShopRoute extends Route {
 
 			let shop = await this.shopRepository.findShopById(id)
 
-			if(shop == undefined){
+			if(shop === undefined){
 				res.status(404)
 				return res.end({ error: "Shop does not exist!"})
 			}
@@ -152,7 +152,7 @@ export default class ShopRoute extends Route {
 		
 				console.log(`${processed}/${total_products}`)
 		
-				if(toSave != 0 && toSave % 250 == 0){
+				if(toSave != 0 && toSave % 250 === 0){
 					console.log(`Saved: ${toSave}`)
 
 					this.shopRepository.storeProductsMany(model, products_save)
@@ -183,7 +183,7 @@ export default class ShopRoute extends Route {
 			let filenameXML = `${source_type}-${shop.slug}.xml`
 			let sourceFilenameXML = await this.shopRepository.getShopSourceXML(shop, source_type)
 
-			if(sourceFilenameXML == null){
+			if(sourceFilenameXML === null){
 				res.status(404)
 				return res.end('Source url does not exist')
 			}

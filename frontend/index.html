@@ -42,12 +42,12 @@
 					<option value="google">Google</option>
 				</select>
 			</div>
-			<template x-if="getSourceType() == 'xml'">
+			<template x-if="getSourceType() === 'xml'">
 				<div class="mb-4 ml-5">
 					<input x-model="sourceURL" x-ref="sourceURLInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Source URL">
 				</div>
 			</template>
-			<template x-if="getSourceType() == 'scraper'">
+			<template x-if="getSourceType() === 'scraper'">
 				<div>
 					<div class="mb-4 ml-5">
 						<select x-model="scraper" x-ref="scraperInput" required class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -240,13 +240,13 @@
 			getSourceConfig: function() {
 				let source_config = null
 
-				if(this.getSourceType() == 'scraper'){
+				if(this.getSourceType() === 'scraper'){
 					let scraper_links = this.scraperConfig.split(/\n/)
 					source_config = {
 						scraper_links: scraper_links,
 						scraper_name: this.scraper
 					}
-				}else if(this.getSourceType() == 'xml'){
+				}else if(this.getSourceType() === 'xml'){
 					source_config = {
 						source_url: this.sourceURL
 					}
@@ -300,7 +300,7 @@
 				let sourcesStr = ""
 
 				sources.forEach(source => {
-					if(source.source_type == 'Scraper'){
+					if(source.source_type === 'Scraper'){
 						sourcesStr +=  `[${source.source_type}]`
 					}else{
 						sourcesStr +=  `[${source.source_type} - ${source.cnt}]`

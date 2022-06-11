@@ -68,7 +68,7 @@ class Singleton {
 						catalog_type = 'heureka'
 					}
 	
-					if(catalog_type == null || items == null){
+					if(catalog_type === null || items === null){
 						return reject({ 
 							error: "Unknown catalog type",
 							catalog_type: catalog_type,
@@ -96,7 +96,7 @@ class Singleton {
 						for (const [field_name, field_value_obj] of Object.entries(fields[catalog_type])) {
 							if(item.hasOwnProperty(field_name)){
 								// ANCHOR Params processing for heureka
-								if(catalog_type == 'heureka' && field_value_obj['tag_name'] == 'params'){
+								if(catalog_type === 'heureka' && field_value_obj['tag_name'] === 'params'){
 									let params = {}
 	
 									item[field_name].forEach(param => {
@@ -115,7 +115,7 @@ class Singleton {
 									})
 	
 									product['params'] = params
-								} else if (catalog_type == 'heureka' && field_value_obj['tag_name'] == 'category_arr') {
+								} else if (catalog_type === 'heureka' && field_value_obj['tag_name'] === 'category_arr') {
 									product['category_arr'] = item[field_name][0]['CATEGORY']
 								} else {
 									product[field_value_obj['tag_name']] = item[field_name][0]
