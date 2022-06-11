@@ -33,7 +33,7 @@ function MongoDatabase(modelName, modelSchema, collectionName) {
 
     mongodb.getModel = async function () {
 
-		if(collectionName != undefined){
+		if(collectionName !== undefined){
 			return mongoose.model(modelName, modelSchema, collectionName)
 		}
         

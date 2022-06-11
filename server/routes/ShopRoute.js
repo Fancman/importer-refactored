@@ -152,7 +152,7 @@ export default class ShopRoute extends Route {
 		
 				console.log(`${processed}/${total_products}`)
 		
-				if(toSave != 0 && toSave % 250 === 0){
+				if(toSave !== 0 && toSave % 250 === 0){
 					console.log(`Saved: ${toSave}`)
 
 					this.shopRepository.storeProductsMany(model, products_save)
