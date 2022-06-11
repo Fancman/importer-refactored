@@ -74,9 +74,6 @@ export default class ProductRepositoryFascade {
 
 		console.log(`Pagination links - Already saved: ${alreadySavedLinks}`, `Saved: ${savedLinks}`, `Total: ${totalNumberOfLinks}`)
 
-		return {
-			alr
-		}
 	}
 
 	async storeProduct(data) {
@@ -88,14 +85,44 @@ export default class ProductRepositoryFascade {
 	
 			for (const [field_name, field_value] of Object.entries(response)) {
 				
-				if (field_name === 'errors') {
+				/*if (field_name === 'errors') {
+					continue;
+				}*/
+		
+				record[field_name] = field_value
+			}
+	
+			record.status = 'scraped'
+	
+			let product = await this.findUpdateById(model, {
+				$set: record
+			}, id)
+	
+			return product
+
+		} catch (error) {
+			return null
+		}
+	
+	}
+
+	async deactivateProduct(data) {
+		try {
+			let { response, id, catalog_slug } = data
+			let record = {}
+	
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+	
+			for (const [field_name, field_value] of Object.entries(response)) {
+				
+				if ( !['errors', 'fieldErrors'].includes(field_name) ) {
 					continue;
 				}
 		
 				record[field_name] = field_value
 			}
 	
-			record.status = 'scraped'
+			record.status = 'deactivated'
 	
 			let product = await this.findUpdateById(model, {
 				$set: record

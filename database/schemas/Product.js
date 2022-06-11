@@ -27,4 +27,5 @@ export default new Schema({
 	primary_image: String,
 	extension_image: String,
 	middleware_id: Number,
+	//createdAt: { type: Date, default: Date.now }
 }, {strict: false, timestamps: true})

@@ -30,12 +30,15 @@ export default class LinksInspectorCrawler {
 
 
 	async crawlPages( parsePageFnc, cleanParsedData, checkDataFnc ) {
+		let totalLinksCount = this._data.product_links.length
+		let processedLinksCount = 0
+
 		for (let product of this._data.product_links) {	
 
 			let url = product.url
 			let id = product.id
 	
-			console.log(`Started inspecting: ^${url}^:`);
+			console.log(`[${processedLinksCount}/${totalLinksCount}] Started inspecting: ^${url}^:`);
 			
 			try {
 				if (this._tab) {
@@ -60,9 +63,16 @@ export default class LinksInspectorCrawler {
 						});
 					} else {
 						console.log( 'Something wrong happend' )
+						EventsObserver.emit('deactivate_product', {
+							scraper_name: this._data.scraper_name,
+							url: url,
+							id: id,
+							response: result.response,
+							catalog_slug: this._data.catalog_slug,
+						});
 					}
 
-					
+					processedLinksCount++					
 				}
 			} catch (error) {
 				console.log(error)

@@ -109,7 +109,7 @@ export default class CrawlerManager {
 			try {
 				
 				let browser = await puppeteer.launch({
-					headless: false,
+					headless: true,
 					args: [
 						'--no-sandbox'
 					]

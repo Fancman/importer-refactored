@@ -16,17 +16,18 @@ class EventsObserver extends EventEmitter {
 
 	init(){
 		this.on('save_product_links', async (data) => {
-			console.log("save_product_links event")
+			//console.log("save_product_links event")
 			this.productRepositoryFascade.storeLinks(data)	
 		})
 
 		this.on('save_link_data', async (data) => {
-			console.log("save_link_data event")	
+			//console.log("save_link_data event")	
 			this.productRepositoryFascade.storeProduct(data)
-				
-			/*setImmediate(async () => {
-				let product = await this.productRepositoryFascade.storeProduct(data)
-			})*/
+		})
+
+		this.on('deactivate_product', async (data) => {
+			//console.log("deactivate_product event")	
+			this.productRepositoryFascade.storeProduct(data)
 		})
 		
 	}

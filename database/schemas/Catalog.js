@@ -15,4 +15,4 @@ export default new Schema({
 		}
 	],
 	createdAt: { type: Date, default: Date.now }
-})
+}, {strict: false, timestamps: true})

@@ -21,4 +21,4 @@ export default new Schema({
 		unique: true,
 		sparse: true
 	}
-}, { strict: false })
+}, {strict: false, timestamps: true})
