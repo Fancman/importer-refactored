@@ -48,7 +48,7 @@ export default class PaginationCrawler {
 				console.log(`Inspcting pagination url: ${firstUrl}`)
 
 				let result = await this.inspectPagination(evaluateFnc, firstUrl)
-				let randomInt = utils.getRandomInt(1500, 5000)
+				let randomInt = utils.getRandomInt(1500, 10000)
 
 				await utils.sleep(randomInt)
 				
