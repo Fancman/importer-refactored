@@ -52,12 +52,13 @@ export default class CatalogRepositoryFascade {
 	}
 
 	async findOneAndUpdateScrapers(Model, id, body) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise( (resolve, reject) => {
 			try {
-				let doc = Model.findOneAndUpdate({_id: id}, {$push: {scrapers: body} }, {
+				Model.findOneAndUpdate({_id: id}, {$push: {scrapers: body} }, {
 					returnOriginal: false, 'upsert': true
+				}).then( (doc) => {
+					return resolve(doc)
 				})
-				return resolve(doc)
 			} catch (error) {
 				return reject(error)
 			}

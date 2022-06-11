@@ -145,7 +145,7 @@ export default class ShopRepositoryFascade {
 	}
 
 	async getCount(Model) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise( (resolve) => {
 			if( Model === null ) {
 				return resolve(0);
 			}
@@ -157,7 +157,7 @@ export default class ShopRepositoryFascade {
 	}
 
 	async findProductBySku(Model, sku) {
-		return new Promise(async (resolve) => {
+		return new Promise( (resolve) => {
 			try {
 				Model.findOne({sku: sku}).then( (product) => {
 					return resolve(product)
@@ -169,10 +169,10 @@ export default class ShopRepositoryFascade {
 	}
 
 	async storeProductsMany(Model, products){
-		return new Promise(async (resolve) => {
+		return new Promise( (resolve) => {
 			try {
-				await Model.insertMany(products).then( (docs) => {
-					resolve(docs)
+				Model.insertMany(products).then( (docs) => {
+					return resolve(docs)
 				})
 			} catch (error) {
 				return resolve(null)

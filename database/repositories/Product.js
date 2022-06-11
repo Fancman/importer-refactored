@@ -16,10 +16,11 @@ export default class ProductRepositoryFascade {
 	}
 
 	async findOne(Model, record) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise( (resolve, reject) => {
 			try {
-				let doc = Model.findOne(record)
-				return resolve(doc)
+				Model.findOne(record).then( (doc) => {
+					return resolve(doc)
+				})
 			} catch (error) {
 				return reject(error)
 			}
@@ -27,10 +28,11 @@ export default class ProductRepositoryFascade {
 	}
 
 	async insertRecord(Model, record) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise( (resolve, reject) => {
 			try {
-				let doc = Model.create(record)
-				return resolve(doc)
+				Model.create(record).then( (doc) => {
+					return resolve(doc)
+				})
 			} catch (error) {
 				return reject(error)
 			}
@@ -137,14 +139,14 @@ export default class ProductRepositoryFascade {
 	}
 
 	async findUpdateById(Model, record, id) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise( (resolve, reject) => {
 			 Model.findByIdAndUpdate(id, record, (err, doc) => {
 	
 				if(err){
-					reject(err)
+					return reject(err)
 				}
 	
-				resolve(doc)
+				return resolve(doc)
 			})
 		})
 	}
