@@ -9,11 +9,11 @@ class Singleton {
         this.message = 'I am an instance';
     }
 
-	async sleep (ms) {
+	static async sleep (ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
-	extractPrice (priceStr) {
+	static extractPrice (priceStr) {
 		if(priceStr === null || priceStr === undefined){
 			return null
 		}
@@ -27,24 +27,24 @@ class Singleton {
 		return null
 	}
 
-	clearText (str) {
+	static clearText (str) {
 		str = str.replace(/(\r\n\t|\n|\r\t)/gm, "")
 		str = str.replace(/\s\s+/g, ' ')
 		str = str.trim()
 		return str
 	}
 	
-	async getRandomInt (min, max) {
+	static async getRandomInt (min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min) + min);
 	}
 
-	async downloadFile (url, filename) {
+	static async downloadFile (url, filename) {
 		return fs.writeFileSync(`storage/${filename}`, await download(url))
 	}
 
-	async parseFile (fields, filename){
+	static async parseFile (fields, filename){
 		return new Promise((resolve, reject) => {
 			let filePath = `storage/${filename}`
 
@@ -148,7 +148,7 @@ class Singleton {
 		})
 	}
 
-	chunk (items, size) {  
+	static chunk (items, size) {  
 		const chunks = []
 		items = [].concat(...items)
 	  
