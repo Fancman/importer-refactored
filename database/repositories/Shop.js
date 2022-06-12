@@ -2,6 +2,8 @@ import { ShopModel } from '../models/Shop.js'
 import { GoogleModelCollection } from '../models/Google.js'
 import { HeurekaModelCollection } from '../models/Heureka.js'
 
+import DBUtils from './DBUtils.js'
+
 export default class ShopRepositoryFascade {
 
 	async getShopSourceXML(shop, source_type){
@@ -69,9 +71,7 @@ export default class ShopRepositoryFascade {
 	{
 		try {
 			let model = await ShopModel
-			let shop = await model.findOne( { title: title} ).exec();
-
-			return shop
+			return await DBUtils.findOne(model, { title: title})
 		} 
 		catch (error) {
 			return null
@@ -82,9 +82,7 @@ export default class ShopRepositoryFascade {
 	{
 		try {
 			let model = await ShopModel
-			let shop = await model.findOne( { _id: id} ).exec();
-
-			return shop
+			return await DBUtils.findOne(model, { _id: id})
 		} 
 		catch (error) {
 			return null
@@ -129,7 +127,7 @@ export default class ShopRepositoryFascade {
 					
 					try {
 						let model = await this.getSourceTypeModel(source_type, source_collection)
-						let cnt =  await this.getCount(model)
+						let cnt =  await DBUtils.getCount(model)
 
 						shops[index].sources[i]['cnt'] = cnt 
 
@@ -144,35 +142,11 @@ export default class ShopRepositoryFascade {
 		return shops
 	}
 
-	async getCount(Model) {
-		return new Promise( (resolve) => {
-			if( Model === null ) {
-				return resolve(0);
-			}
-			
-			Model.count({}, (err, count) => {
-				return resolve(count)
-			});
-		})
-	}
-
 	async findProductBySku(Model, sku) {
 		return new Promise( (resolve) => {
 			try {
 				Model.findOne({sku: sku}).then( (product) => {
 					return resolve(product)
-				})
-			} catch (error) {
-				return resolve(null)
-			}
-		})
-	}
-
-	async storeProductsMany(Model, products){
-		return new Promise( (resolve) => {
-			try {
-				Model.insertMany(products).then( (docs) => {
-					return resolve(docs)
 				})
 			} catch (error) {
 				return resolve(null)

@@ -7,6 +7,7 @@ import Utils from '../../utils/index.js'
 import slugify from 'slugify'
 
 import fieldsXML from '../../utils/fields.js'
+import DBUtils from '../../database/repositories/DBUtils.js'
 
 export default class ShopRoute extends Route {
 
@@ -102,7 +103,7 @@ export default class ShopRoute extends Route {
 
 			let products = response['products']
 
-			if(products === undefined){
+			if(typeof products === 'undefined'){
 				res.status(404)
 				return res.end({ error: "Products don't exist!"})
 			}
@@ -155,14 +156,14 @@ export default class ShopRoute extends Route {
 				if(toSave !== 0 && toSave % 250 === 0){
 					console.log(`Saved: ${toSave}`)
 
-					this.shopRepository.storeProductsMany(model, products_save)
+					DBUtils.storeMany(model, products_save)
 		
 					products_save = []
 				}
 			}, undefined)
 		
 			if(products_save.length){
-				this.shopRepository.storeProductsMany(model, products_save)
+				DBUtils.storeMany(model, products_save)
 			}
 		
 			return res.send({'toSave': toSave})

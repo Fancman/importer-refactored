@@ -34,6 +34,10 @@ export default class ScraperRoute extends Route {
 			this.stopScrapePagination(req, res, next)
 		})
 
+		this._router.post('/stop-scrape-products', async (req, res, next) => {
+			this.stopScrapeProducts(req, res, next)
+		})
+
 		this._router.post('/scrape-products', async (req, res, next) => {
 			this.scrapeProducts(req, res, next)
 		})
@@ -64,7 +68,7 @@ export default class ScraperRoute extends Route {
 
 		} catch (error) {
 			res.status(404)
-			res.end(error.message)
+			return res.end(error.message)
 		}
 	}
 
@@ -97,7 +101,7 @@ export default class ScraperRoute extends Route {
 
 		} catch (error) {
 			res.status(404)
-			res.end(error.message)
+			return res.end(error.message)
 		}
 	}
 
@@ -112,7 +116,22 @@ export default class ScraperRoute extends Route {
 
 		} catch (error) {
 			res.status(404)
-			res.end(error.message)
+			return res.end(error.message)
+		}
+	}
+
+	async stopScrapePagination(req, res, next) {
+		try {
+			let ACTION = 'inspectLinksAndStoreData'
+			let scraper_name = req.body.scraper.name
+
+			this._crawlermanager.stopAction(scraper_name, ACTION)
+
+			return res.send('Stopping crawling')
+
+		} catch (error) {
+			res.status(404)
+			return res.end(error.message)
 		}
 	}
 
@@ -122,7 +141,7 @@ export default class ScraperRoute extends Route {
 			res.send(scrapers)
 		} catch (error) {
 			res.status(404)
-			res.send({ error: error })
+			return res.send({ error: error })
 		}
 	}
 }

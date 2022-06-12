@@ -2,6 +2,7 @@ import ShopRoute from "./routes/ShopRoute.js"
 //import CrawlerRoute from "./routes/CrawlerRoute.js"
 import CatalogRoute from "./routes/CatalogRoute.js"
 import ScraperRoute from "./routes/ScraperRoute.js"
+import ProductRoute from "./routes/ProductRoute.js"
 
 export default class Router {
 
@@ -19,11 +20,13 @@ export default class Router {
 	addRoutes() {
 		let shopRouter = new ShopRoute().getRouter()
 		let catalogRouter = new CatalogRoute().getRouter()
+		let productRouter = new ProductRoute().getRouter()
 		let scraperRouter = new ScraperRoute(this._startegymanager, this._crawlerManager).getRouter()
 
 		this._app.use('/api/shops', shopRouter)
 		this._app.use('/api/catalogs', catalogRouter)
 		this._app.use('/api/scrapers', scraperRouter)
+		this._app.use('/api/products', productRouter)
 	}
 
 }

@@ -229,7 +229,7 @@
 					})
 				}
 
-				return await requestHandler(`${apis.scrapersEndpointUrl}/stop-scrape-links`, options)
+				return await requestHandler(`${apis.scrapersEndpointUrl}/stop-scrape-products`, options)
 				.catch(err => console.log(err))
 			}, 
 			stopScrapeLinks: async function(catalog, scraper){

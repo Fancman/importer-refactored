@@ -3,7 +3,20 @@ import { ProductModelCollection } from '../models/Product.js'
 
 import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 
+import DBUtils from './DBUtils.js'
+
 export default class ProductRepositoryFascade {
+
+	async updateProductsCategory(catalog_slug, products_ids, category) {
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		let products = await DBUtils.updateMany(model, 
+			{ _id: { $in: products_ids } },
+			{ category: category }
+		)
+
+		return products
+	}
 
 	async getModelByCatalogSlug(catalogSlug){
 		try {
@@ -13,30 +26,6 @@ export default class ProductRepositoryFascade {
 		} catch (error) {
 			return null
 		}
-	}
-
-	async findOne(Model, record) {
-		return new Promise( (resolve, reject) => {
-			try {
-				Model.findOne(record).then( (doc) => {
-					return resolve(doc)
-				})
-			} catch (error) {
-				return reject(error)
-			}
-		})
-	}
-
-	async insertRecord(Model, record) {
-		return new Promise( (resolve, reject) => {
-			try {
-				Model.create(record).then( (doc) => {
-					return resolve(doc)
-				})
-			} catch (error) {
-				return reject(error)
-			}
-		})
 	}
 
 	async storeLinks(data) {
@@ -51,7 +40,7 @@ export default class ProductRepositoryFascade {
 		for ( const link of links ) {
 
 			try {
-				let product = await this.findOne(model, {url: link})
+				let product = await DBUtils.findOne(model, {url: link})
 	
 				if( product !== null ){
 					alreadySavedLinks++
@@ -64,7 +53,7 @@ export default class ProductRepositoryFascade {
 					scraper_name: scraper_name,
 				}
 		
-				await this.insertRecord(model, productObj)
+				await DBUtils.insertRecord(model, productObj)
 
 				savedLinks++
 
@@ -96,7 +85,7 @@ export default class ProductRepositoryFascade {
 	
 			record.status = 'scraped'
 	
-			let product = await this.findUpdateById(model, {
+			let product = await DBUtils.findUpdateById(model, {
 				$set: record
 			}, id)
 	
@@ -126,7 +115,7 @@ export default class ProductRepositoryFascade {
 	
 			record.status = 'deactivated'
 	
-			let product = await this.findUpdateById(model, {
+			let product = await DBUtils.findUpdateById(model, {
 				$set: record
 			}, id)
 	
@@ -137,20 +126,7 @@ export default class ProductRepositoryFascade {
 		}
 	
 	}
-
-	async findUpdateById(Model, record, id) {
-		return new Promise( (resolve, reject) => {
-			 Model.findByIdAndUpdate(id, record, (err, doc) => {
 	
-				if(err){
-					return reject(err)
-				}
-	
-				return resolve(doc)
-			})
-		})
-	}
-
 	async getProductsWithNoneStatus(catalogSlug, criteria){
 		try {
 			let model = await this.getModelByCatalogSlug(catalogSlug)
