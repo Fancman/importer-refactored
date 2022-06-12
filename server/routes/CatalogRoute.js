@@ -3,6 +3,8 @@ import Route from './_index.js'
 import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 import ProductRepositoryFascade from "../../database/repositories/Product.js"
 
+import EventsObserver from "../../database/Observer.js"
+
 export default class ShopRoute extends Route {
 
 	constructor () {
@@ -21,6 +23,10 @@ export default class ShopRoute extends Route {
 			this.storeCatalog(req, res, next)
 		})
 
+		this._router.post('/download-images', async (req, res, next) => {
+			this.downloadImages(req, res, next)
+		})
+		
 		this._router.get('/counts', async (req, res, next) => {
 			this.getCatalogCounts(req, res, next)
 		})
@@ -30,16 +36,35 @@ export default class ShopRoute extends Route {
 		})
 	}
 
+	async downloadImages(req, res, next)
+	{
+		try {
+			let catalog_slug = req.body.catalog.slug
+			let scraper_name = req.body.scraper.name
+
+			let products =  await this.productRepository.findWithoutDownloadedImages(catalog_slug, scraper_name)
+
+			EventsObserver.emit('save_image', {
+				products: products,
+				catalog_slug: catalog_slug,
+			})
+
+			return res.send('ok')
+		} catch (error) {
+			res.status(400)
+			return res.end(error.message)
+		}
+	}
+
 	async getCatalogs(req, res, next)
 	{
 		try {
 			let catalogs = await this.catalogRepository.findCatalogs()
 
-			res.send(catalogs)
-
+			return res.send(catalogs)
 		} catch (error) {
-			res.status(404)
-			res.end(error.message)
+			res.status(400)
+			return res.end(error.message)
 		}
 	}
 
@@ -47,11 +72,11 @@ export default class ShopRoute extends Route {
 		try {
 			let counts = await this.productRepository.getCatalogStatusesCount()
 
-			res.send(counts)
+			return res.send(counts)
 
 		} catch (error) {
-			res.status(404)
-			res.end(error.message)
+			res.status(400)
+			return res.end(error.message)
 		}
 	}
 
@@ -63,11 +88,11 @@ export default class ShopRoute extends Route {
 
 			let catalog = await this.catalogRepository.storeCatalog(title, url)
 
-			res.send(catalog)
+			return res.send(catalog)
 
 		} catch (error) {
-			res.status(404)
-			res.end(error.message)
+			res.status(400)
+			return res.end(error.message)
 		}
 
 	}
@@ -81,11 +106,11 @@ export default class ShopRoute extends Route {
 
 			let catalog = await this.catalogRepository.addScraperConfig(selectedScraper, selectedCatalog, scraper_links)
 
-			res.send(catalog)
+			return res.send(catalog)
 
 		} catch (error) {
-			res.status(404)
-			res.end(error.message)
+			res.status(400)
+			return res.end(error.message)
 		}
 
 	}

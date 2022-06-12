@@ -1,13 +1,94 @@
 
 import fs from "fs"
 import xml2js from "xml2js"
-import download from "download";
+import download from "download"
+import https from "https"
 
 class Singleton {
 
     constructor() {
         this.message = 'I am an instance';
     }
+
+	static async fileExists (path){
+		return new Promise((resolve) => {
+			fs.access(path, fs.F_OK, (err) => {
+
+				if (err) {
+					return resolve(false)
+				}
+			  
+				return resolve(true)
+			})
+		})
+	}
+
+	static async dirExists (dir){
+		return new Promise((resolve) => {
+			fs.access(dir, (err) => {
+
+				if (err) {
+					return resolve(false)
+				}
+			  
+				return resolve(true)
+			})
+		})
+	}
+
+	static async mkdirsSync (dir){
+		return new Promise((resolve) => {
+			if (fs.existsSync(dir)) {
+				return resolve()
+			}
+			
+			fs.mkdirSync(dir, { recursive: true }).then(() => {
+				return resolve()
+			})
+		})
+	}
+
+	static async downloadImage(url, dir, id) {
+		return new Promise((resolve, reject) => {
+			https.get(url, async (res) => {
+				let contentType = res.headers['content-type']
+	
+				let imageTypes = {
+					'image/avif': 'avif',
+					'image/gif': 'gif',
+					'image/jpeg': 'jpeg',
+					'image/png': 'png',
+					'image/webp': 'webp',
+				}
+
+				await this.mkdirsSync(dir)
+	
+				if( ! imageTypes.hasOwnProperty(contentType)){
+					return reject('File does not have a image type')
+				}
+	
+				let filepath = `${dir}${id}.${imageTypes[contentType]}`;
+	
+				let fileExistsBool = await this.fileExists(filepath)
+	
+				if(fileExistsBool){
+					return resolve(imageTypes[contentType])
+				}
+	
+				if (res.statusCode === 200) {
+					res.pipe(fs.createWriteStream(filepath))
+						.on('error', reject)
+						.once('close', () => {
+							return resolve(imageTypes[contentType])
+						})
+				} else {
+					// Consume response data to free up memory
+					res.resume();
+					return reject(new Error(`Request Failed With a Status Code: ${res.statusCode}`))
+				}
+			});
+		});
+	}
 
 	static async sleep (ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
@@ -34,7 +115,7 @@ class Singleton {
 		return str
 	}
 	
-	static async getRandomInt (min, max) {
+	static getRandomInt (min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min) + min);
@@ -162,4 +243,4 @@ class Singleton {
 	}
 }
 
-export default new Singleton();
+export default Singleton;

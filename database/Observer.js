@@ -31,6 +31,10 @@ class EventsObserver extends EventEmitter {
 			//console.log("deactivate_product event")	
 			this.productRepositoryFascade.storeProduct(data)
 		})
+
+		this.on('save_image', async (data) => {
+			this.productRepositoryFascade.saveImage(data)
+		})
 		
 	}
 }

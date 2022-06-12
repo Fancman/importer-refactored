@@ -5,7 +5,63 @@ import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 
 import DBUtils from './DBUtils.js'
 
+import Utils from '../../utils/index.js'
+
 export default class ProductRepositoryFascade {
+
+	async saveImage(data) {
+		const { products, catalog_slug } = data
+
+		for (let product of products) {
+
+			let randomInt = Utils.getRandomInt(1500, 10000)
+
+			try {
+				let primary_image = product.primary_image
+				let id = product._id
+	
+				let extension = await Utils.downloadImage(primary_image, 'storage/images/' + catalog_slug + '/', id)
+	
+				if ( extension ) {
+					await this.updateImageExt(id, catalog_slug, extension)
+				}
+
+				await Utils.sleep(randomInt)
+
+			} catch (error) {
+				console.log(error)
+
+				await Utils.sleep(randomInt)
+
+				continue
+			}
+			
+		}
+		
+	}
+
+	async findWithoutDownloadedImages(catalog_slug, scraper_name) {
+		let query = {
+			$and: [
+				{
+					$or: [
+						{extension_image: ''},
+						{extension_image: {$exists : false}}
+					]
+				},
+				{
+					scraper_name: scraper_name
+				},
+				{
+					primary_image: {$exists : true}
+				}
+			]
+		}
+	
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		return await DBUtils.find(model, query)
+	}
 
 	async paginate( catalog_slug, filter, options ) {
 		let model = await this.getModelByCatalogSlug(catalog_slug)
@@ -61,6 +117,19 @@ export default class ProductRepositoryFascade {
 		let model = await this.getModelByCatalogSlug(catalog_slug)
 
 		return await DBUtils.find(model, finalQuery)
+	}
+
+	async updateImageExt(product_id, catalog_slug, extension) {
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		return await DBUtils.findUpdateById(model, 
+			{
+				$set: {
+					extension_image: extension
+				}
+			},
+			product_id
+		)
 	}
 
 	async updateProductsCategory(catalog_slug, products_ids, category) {
