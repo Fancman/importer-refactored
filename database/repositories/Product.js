@@ -7,6 +7,62 @@ import DBUtils from './DBUtils.js'
 
 export default class ProductRepositoryFascade {
 
+	async paginate( catalog_slug, filter, options ) {
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		return await model.paginate(filter, options)
+	}
+
+	async search( catalog_slug, input, category ) {
+		let queries = []
+
+		if ( category !== undefined && category !== null && category !== 0 ) {
+			let lft = category.lft
+			let rgt = category.rgt
+	
+			queries.push({
+				$and : [
+					{ 'category.lft': { $gte: lft }},
+					{ 'category.rgt': { $lte: rgt }}
+				]
+			})
+		}
+
+		if ( input !== undefined && searchInput !== ""){
+			let re = new RegExp(searchInput, 'i')
+	
+			queries.push({
+				$or: [
+					{title: { $regex: re }},
+					{description: { $regex: re }}
+				]
+			})
+		}
+
+		if ( category == 0 ) {
+			queries = [
+				{
+					$or: [
+						{category: {$exists : false}},
+						{category: null}
+					]
+				}
+			]
+		}
+
+		let finalQuery = {}
+
+		if ( queries.length > 0 ) {
+			finalQuery = {
+				$and: queries
+			}
+		}
+
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		return await DBUtils.find(model, finalQuery)
+	}
+
 	async updateProductsCategory(catalog_slug, products_ids, category) {
 		let model = await this.getModelByCatalogSlug(catalog_slug)
 

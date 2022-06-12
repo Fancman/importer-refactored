@@ -22,10 +22,10 @@
 		height: 40px;
 		cursor: pointer;
 	}
-	*{
-		-webkit-user-select: none;  /* Chrome all / Safari all */
-		-moz-user-select: none;     /* Firefox all */
-		-ms-user-select: none;      /* IE 10+ */
+	img, p, h1, a, span{
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
 		user-select: none; 
 	}
 	.dragArea{
@@ -46,10 +46,10 @@
 		border:1px solid rgba(0,0,255,.15);
 		background:rgba(0,0,255,.05);
 	}
-	html {
+	/*html {
 		scroll-behavior: smooth;
 		overscroll-behavior: auto;
-	}
+	}*/
 </style>
 
 
@@ -248,24 +248,28 @@
 				await this.loadProducts()
 			},
 			loadCategories: async function() {
-				let firstCatalogURL = this.getFirstCatalog().url
-				let apiPath = `${firstCatalogURL}api/categories`
+				try {
+					let firstCatalogURL = this.getFirstCatalog().url
+					let apiPath = `${firstCatalogURL}api/categories`
 
-				let options = {
-					method: 'GET',
+					let options = {
+						method: 'GET',
+					}
+
+					let categories = await requestHandler(`${apiPath}`, options);
+
+					this.categories = categories
+
+					let categoriesIDS = []
+
+					categories.forEach( function( category ){
+						categoriesIDS[category.id] = category
+					})
+
+					this.categoriesIds = categoriesIDS	
+				} catch (error) {
+					console.log(error)
 				}
-
-				let categories = await requestHandler(`${apiPath}`, options);
-
-				this.categories = categories
-
-				let categoriesIDS = []
-
-				categories.forEach( function( category ){
-					categoriesIDS[c.id] = category
-				})
-
-				this.categoriesIds = categoriesIDS		
 			},
 			searchInputChange: async function(){
 				let selectedCategoryId = (this.selectedCategorySearch != null && this.selectedCategorySearch !== "") ? parseInt( this.selectedCategorySearch ) : null
@@ -304,15 +308,14 @@
 				.catch(err => console.log(err))
 			},
 			loadProducts: async function() {
-				let firstCatalogSlug = this.getFirstCatalog().slug
-
+			
 				let options = {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						catalogSlug: firstCatalogSlug
+						catalog: this.getFirstCatalog().slug
 					})
 				}
 
@@ -385,12 +388,15 @@
 			//console.log("event.target", event.target.tagName)
 
 			if(event.target.tagName !== 'BODY'){
+				//console.log('false', false)
 				return false;
 			}
 
 			drag = true;
 			sx = event.pageX;
 			sy = event.pageY;
+
+			//console.log('event.which', event.which)
 		
 			switch (event.which) {
 				case 1:
@@ -411,8 +417,16 @@
 		});
 
 		document.addEventListener("mouseup", function( event ) {  
+
+			if ( drag === false ) {
+				console.log(false)
+				return false;
+			}
+
 			drag = false;
 			document.querySelector('.dragArea').setAttribute("style", "display:none;");
+
+			
 		
 			ex = event.pageX;
 			ey = event.pageY;
@@ -430,11 +444,13 @@
 			}
 			switch (event.which) {
 				case 1:
-					//Left Mouse button pressed. Check                   
+					//Left Mouse button pressed. Check   
+					console.log('Left Mouse button pressed. Check')                
 					selectItems(true);
 					break;
 				case 3:
-					//Right Mouse button pressed. Uncheck       
+					//Right Mouse button pressed. Uncheck
+					console.log('Right Mouse button pressed. Uncheck')       
 					selectItems(false);
 					break;
 				default:
@@ -443,7 +459,8 @@
 		});
 
 		function selectItems(checked){
-			document.querySelectorAll("input[type=checkbox].product-checkbox").forEach(function(element){
+			//console.log('Switching items to: ', checked)
+			document.querySelectorAll("input[type=checkbox].product-checkbox").forEach( function(element){
 				var pos = { 
 					top: element.offsetTop, 
 					left: element.offsetLeft, 
@@ -456,21 +473,26 @@
 				var cyLow = pos.top;
 				var cyHi = pos.top + element.offsetHeight;
 
-				if(cxLow <= sx && sx <= cxHi && cxLow <= ex && ex <= cxHi ){
+				/*if(cxLow <= sx && sx <= cxHi && cxLow <= ex && ex <= cxHi ){
+					console.log('1. level')
 					if(cyLow <= sy && sy <= cyHi && cyLow <= ey && ey <= cyHi){
+						console.log('2. level')
 						let checked = element.checked
+
 						if(checked){
 							element.checked = false
 						}else{
 							element.checked = true
-
 						}
 						
 					}
 				}        
-				else if(sx <= cxHi && ex >= cxLow ){
+				else */
+				if(sx <= cxHi && ex >= cxLow ){
+					//console.log('3. level')
 					if(sy <= cyHi && ey >= cyLow){
-						element.checked = true
+						//console.log('4. level')
+						element.checked = checked
 					}
 				}
 			});

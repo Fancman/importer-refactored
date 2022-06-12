@@ -13,6 +13,18 @@ class DBUtils {
 		})
 	}
 
+	async find(Model, query) {
+		return new Promise( (resolve, reject) => {
+			try {
+				Model.find(query).then( (docs) => {
+					return resolve(docs)
+				})
+			} catch (error) {
+				return reject(error)
+			}
+		})
+	}
+
 	async findOne(Model, record) {
 		return new Promise( (resolve, reject) => {
 			try {

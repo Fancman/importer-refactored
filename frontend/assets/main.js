@@ -3,9 +3,7 @@ const apis = {
 	catalogsEndpointUrl: "http://localhost:4000/api/catalogs",
 	productsEndpointUrl: "http://localhost:4000/api/products",
 	shopsEndpointUrl: "http://localhost:4000/api/shops",
-	//crawlerEndpointUrl: "http://localhost:4000/api/crawler"
 	scrapersEndpointUrl: "http://localhost:4000/api/scrapers",
-	//endpointUtils: "http://localhost:4000/api/utils",
 }
 
 const twillApis = {

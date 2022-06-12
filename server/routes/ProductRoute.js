@@ -1,6 +1,7 @@
 import Route from './_index.js'
 
 import ShopRepositoryFascade from "../../database/repositories/Shop.js"
+import ProductRepositoryFascade from "../../database/repositories/Product.js"
 
 import Utils from '../../utils/index.js'
 
@@ -14,14 +15,42 @@ export default class ProductRoute extends Route {
 		super()
 
 		this.shopRepository = new ShopRepositoryFascade()
+		this.productRepository = new ProductRepositoryFascade()
 	}
 
 	indexRoutes(){
 		this._router.post('/update-category', async (req, res, next) => {
 			this.updateCategory(req, res, next)
 		})
+
+		this._router.post('/search', async (req, res, next) => {
+			this.search(req, res, next)
+		})
+
+		this._router.post('/paginate', async (req, res, next) => {
+			this.paginate(req, res, next)
+		})
 	}
 
+	async paginate(req, res, next)
+	{
+		try {
+			let catalog_slug = req.body.catalog
+
+			let products = await this.productRepository.paginate(
+				catalog_slug,
+				{ status: 'scraped' },
+				{ page: 1, limit: 100 }
+			)
+
+			return res.send(products)
+			
+		} catch (error) {
+			res.status(400)
+			return res.end(error.message)
+		}
+
+	}
 
 	async updateCategory(req, res, next)
 	{
@@ -39,7 +68,29 @@ export default class ProductRoute extends Route {
 			return res.send(products)
 			
 		} catch (error) {
-			res.status(404)
+			res.status(400)
+			return res.end(error.message)
+		}
+
+	}
+
+	async search(req, res, next)
+	{
+		try {
+			let catalog_slug = req.body.catalog
+			let input = req.body.input
+			let category = req.body.category
+
+			let products = await this.productRepository.search(
+				catalog_slug,
+				input,
+				category
+			)
+
+			return res.send(products)
+			
+		} catch (error) {
+			res.status(400)
 			return res.end(error.message)
 		}
 
