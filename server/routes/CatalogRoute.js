@@ -100,8 +100,8 @@ export default class ShopRoute extends Route {
 	async addScraperConfig(req, res, next){
 		
 		try {
-			let selectedScraper = req.body.selectedScraper
-			let selectedCatalog = req.body.selectedCatalog
+			let selectedScraper = req.body.scraper
+			let selectedCatalog = req.body.catalog
 			let scraper_links = req.body.scraper_links
 
 			let catalog = await this.catalogRepository.addScraperConfig(selectedScraper, selectedCatalog, scraper_links)

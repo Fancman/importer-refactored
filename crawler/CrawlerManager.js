@@ -110,9 +110,15 @@ export default class CrawlerManager {
 				
 				let browser = await puppeteer.launch({
 					headless: true,
+					ignoreHTTPSErrors: true,
 					args: [
-						'--no-sandbox'
-					]
+						'--no-sandbox',
+						`--window-size=1920,1080`
+					],
+					defaultViewport: {
+						width: 1920,
+						height: 1080
+					}
 				});
 				return resolve(browser)
 			} catch (error) {

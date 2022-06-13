@@ -49,6 +49,11 @@ export default class LinksInspectorCrawler {
 
 					let result = await this.inspectPage(parsePageFnc, url)
 
+					if ( typeof result.response === 'undefined' ) {
+						this._running = false
+						break
+					}
+
 					result = await cleanParsedData( result )
 
 					let checkResponseDataResult = await checkDataFnc( result )

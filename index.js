@@ -5,6 +5,7 @@ import CrawlerManager from "./crawler/CrawlerManager.js"
 import RellecigaDomainStrategy from './crawler/strategies/RellecigaDomainStrategy.js'
 import AstratexDomainStrategy from './crawler/strategies/AstratexDomainStrategy.js'
 import SaxanaDomainStrategy from './crawler/strategies/SaxanaDomainStrategy.js'
+import SperkyEshopDomainStrategy from './crawler/strategies/SperkyEshopDomainStrategy.js'
 
 (async () => {
 	/*console.log("START")
@@ -17,6 +18,7 @@ import SaxanaDomainStrategy from './crawler/strategies/SaxanaDomainStrategy.js'
 	strategyManager.addStrategy(new RellecigaDomainStrategy())
 	strategyManager.addStrategy(new AstratexDomainStrategy())
 	strategyManager.addStrategy(new SaxanaDomainStrategy())
+	strategyManager.addStrategy(new SperkyEshopDomainStrategy())
 
 	//console.log(strategyManager.getStrategiesNames())
 

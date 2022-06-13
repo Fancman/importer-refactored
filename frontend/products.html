@@ -79,7 +79,7 @@
 		<div class="flex flex-row mb-3 items-center">
 			<div class="mr-4">
 				<div>
-					<select x-model="selectedCatalog" x-ref="selectedCatalogInput" placeholder="Select Catalog" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+					<select x-on:change="catalogChange()" x-model="selectedCatalog" x-ref="selectedCatalogInput" placeholder="Select Catalog"  class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
 						<template x-for="catalog in catalogs" :key="catalog._id">
 							<option :value="catalog.slug" x-text="catalog.title"></option>
 						</template>
@@ -144,10 +144,10 @@
 		<div class="py-6 flex flex-wrap">
 			<template x-for="product in products" :key="product._id">
 				<div class="flex m-2 bg-white shadow-lg rounded-lg overflow-hidden product">
-					<template x-if="product.extension_image != undefined && 1==2" x-data="{ product: product, url: `../storage/images/${product._id}.${product.extension_image}` }">
-						<img class="w-1/3 object-cover" :src="url">
+					<template x-if="product.extension_image != undefined && product.extension_image != ''" x-data="{ product: product, url: `../storage/images/${selectedCatalog}/${product._id}.${product.extension_image}` }">
+						<img class="w-2/5 object-cover" :src="url">
 					</template>
-					<template x-if="product.primary_image != undefined">
+					<template x-if="(product.extension_image == undefined || product.extension_image == '') && product.primary_image != undefined">
 						<img class="w-2/5 object-cover" :src="product.primary_image">
 					</template>
 					<div class="w-3/5 p-4 flex flex-col mt-auto">
@@ -193,8 +193,13 @@
 				console.log('Initializing')	
 
 				this.catalogs = await this.loadCatalogs()
+
+				let catalog = await this.getFirstCatalog('initialize')
+
+				this.selectedCatalog = catalog.slug
+
 				await this.loadProducts()
-				await this.loadCategories()
+				await this.loadCategories()				
 			},
 			selectAll: async function(){
 				let checkboxes = document.querySelectorAll("input[type=checkbox].product-checkbox")
@@ -225,13 +230,15 @@
 					return false
 				}
 
+				let catalog = await this.getFirstCatalog('applyCategory')
+
 				let options = {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						catalog: this.getFirstCatalog().slug,
+						catalog: catalog.slug,
 						ids: ids,
 						category: {
 							id: categoryData.id,
@@ -249,7 +256,8 @@
 			},
 			loadCategories: async function() {
 				try {
-					let firstCatalogURL = this.getFirstCatalog().url
+					let catalog = await this.getFirstCatalog('loadCategories')
+					let firstCatalogURL = catalog.url
 					let apiPath = `${firstCatalogURL}api/categories`
 
 					let options = {
@@ -271,11 +279,16 @@
 					console.log(error)
 				}
 			},
+			catalogChange: async function(){
+				await this.loadProducts()
+				.catch(err => console.log(err))
+			},
 			searchInputChange: async function(){
 				let selectedCategoryId = (this.selectedCategorySearch != null && this.selectedCategorySearch !== "") ? parseInt( this.selectedCategorySearch ) : null
+				let catalog = await this.getFirstCatalog('searchInputChange')
 				
 				let requestBody = {
-					catalog: this.getFirstCatalog().slug,
+					catalog: catalog.slug,
 					searchInput: this.searchInput,
 				}
 
@@ -308,6 +321,8 @@
 				.catch(err => console.log(err))
 			},
 			loadProducts: async function() {
+
+				let catalog = await this.getFirstCatalog('loadProducts')
 			
 				let options = {
 					method: 'POST',
@@ -315,7 +330,7 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						catalog: this.getFirstCatalog().slug
+						catalog: catalog.slug
 					})
 				}
 
@@ -332,12 +347,21 @@
 					}*/
 				}		
 			},
-			getFirstCatalog: function(){
-				if(this.selectedCatalog === ''){
-					return this.catalogs[0]
+			getFirstCatalog: async function( start ){
+
+				//console.log('Called getFirstCatalog()', start)
+
+				if( this.selectedCatalog === '' ){
+					return await this.catalogs[0]
 				}
 
-				return selectedCatalog
+				for ( const catalog of this.catalogs ) {
+					if ( this.selectedCatalog === catalog.slug) {
+						return catalog
+					}
+				}
+
+				return null
 			}
 		}
 	}
@@ -419,7 +443,6 @@
 		document.addEventListener("mouseup", function( event ) {  
 
 			if ( drag === false ) {
-				console.log(false)
 				return false;
 			}
 
