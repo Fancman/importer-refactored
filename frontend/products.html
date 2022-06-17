@@ -92,7 +92,7 @@
 					<div class="absolute top-4 left-3">
 						<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-6 h-6"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 					</div> 
-					<input x-on:input="searchInputChange()" x-model="searchInput" x-ref="selectedSearchInput" type="text" class="h-14 w-full pl-10 pr-20 rounded-lg z-0 focus:shadow focus:outline-none border-2 border-indigo-500/100 hover:bg-indigo-100" placeholder="Search anything...">
+					<input x-on:keyup="searchInputTextChange()" x-model="searchInput" x-ref="selectedSearchInput" type="text" class="h-14 w-full pl-10 pr-20 rounded-lg z-0 focus:shadow focus:outline-none border-2 border-indigo-500/100 hover:bg-indigo-100" placeholder="Search anything...">
 					<div class="absolute top-2 right-2"> 
 						<button class="h-10 w-20 text-white rounded-lg bg-indigo-500 hover:bg-indigo-600">Search</button>
 					</div>
@@ -107,6 +107,16 @@
 						<template x-for="category in categories" :key="category.id">
 							<option :value="category.id" x-text="category.title"></option>
 						</template>
+					</select>
+				</div>
+			</div>
+
+			<div class="mr-4 ml-5">
+				<div>
+					<select x-on:change="searchInputChange()" x-model="statusFilter" x-ref="statusFilterInput" placeholder="Select Status" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+						<option value="all">All</option>
+						<option selected value="scraped">Scraped</option>
+						<option value="none">None</option>
 					</select>
 				</div>
 			</div>
@@ -189,9 +199,11 @@
 			categoriesIds: [],
 			selectAllCheckbox: false,
 			selectedCategorySearch: null,
+			statusFilter: 'scraped',
 			selectedCategoryEdit: '',
 			searchInput: '',
 			selectedCatalog: '',
+			timeout: null,
 			initialize: async function() {
 				console.log('Initializing')	
 
@@ -286,6 +298,12 @@
 				await this.loadProducts()
 				.catch(err => console.log(err))
 			},
+			searchInputTextChange: async function(){
+				clearTimeout(this.timeout);
+				this.timeout = setTimeout( () => {
+					this.searchInputChange()
+				}, 1000);
+			},
 			searchInputChange: async function(){
 				let selectedCategoryId = (this.selectedCategorySearch != null && this.selectedCategorySearch !== "") ? parseInt( this.selectedCategorySearch ) : null
 				let catalog = await this.getFirstCatalog('searchInputChange')
@@ -293,6 +311,7 @@
 				let requestBody = {
 					catalog: catalog.slug,
 					searchInput: this.searchInput,
+					statusFilter: this.statusFilter
 				}
 
 				if( selectedCategoryId != null && selectedCategoryId != 0 ){
@@ -314,7 +333,7 @@
 					body: JSON.stringify(requestBody)
 				}
 
-				if( (selectedCategoryId != null || this.searchInput.length > 3) || (selectedCategoryId == null && this.searchInput.length < 3)){
+				if( (this.searchInput.length > 3) || (this.selectedCategoryId !== null) || (this.statusFilter !== "all")){
 					this.products = await requestHandler(`${apis.productsEndpointUrl}/search`, options)
 					.catch(err => console.log(err))
 				}

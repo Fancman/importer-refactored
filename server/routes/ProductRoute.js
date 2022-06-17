@@ -78,13 +78,15 @@ export default class ProductRoute extends Route {
 	{
 		try {
 			let catalog_slug = req.body.catalog
-			let input = req.body.input
+			let input = req.body.searchInput
 			let category = req.body.category
+			let status = req.body.statusFilter
 
 			let products = await this.productRepository.search(
 				catalog_slug,
 				input,
-				category
+				category,
+				status
 			)
 
 			return res.send(products)
