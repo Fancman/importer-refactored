@@ -112,8 +112,14 @@ export default class ProductRepositoryFascade {
 		return await model.paginate(filter, options)
 	}
 
-	async search( catalog_slug, input, category ) {
+	async search( catalog_slug, input, category, status ) {
 		let queries = []
+
+		if ( status !== "all" ) {
+			queries.push({
+				status: status
+			})
+		}
 
 		if ( category !== undefined && category !== null && category !== 0 ) {
 			let lft = category.lft
@@ -127,8 +133,8 @@ export default class ProductRepositoryFascade {
 			})
 		}
 
-		if ( input !== undefined && searchInput !== ""){
-			let re = new RegExp(searchInput, 'i')
+		if ( input !== undefined && input !== ""){
+			let re = new RegExp(input, 'i')
 	
 			queries.push({
 				$or: [
@@ -139,14 +145,12 @@ export default class ProductRepositoryFascade {
 		}
 
 		if ( category == 0 ) {
-			queries = [
-				{
-					$or: [
-						{category: {$exists : false}},
-						{category: null}
-					]
-				}
-			]
+			queries.push({
+				$or: [
+					{category: { $exists : false }},
+					{category: null}
+				]
+			})
 		}
 
 		let finalQuery = {}

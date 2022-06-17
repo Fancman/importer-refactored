@@ -283,10 +283,18 @@
 
 					this.categories = categories
 
+					console.log(categories)
+
 					let categoriesIDS = []
 
 					categories.forEach( function( category ){
 						categoriesIDS[category.id] = category
+					})
+
+					categories.forEach( function( category ){
+						if ( typeof category.parent_id !== 'undefined' && category.parent_id !== null ){
+							categoriesIDS[category.id].title = categoriesIDS[category.parent_id].title + " > " + category.title
+						}
 					})
 
 					this.categoriesIds = categoriesIDS	
