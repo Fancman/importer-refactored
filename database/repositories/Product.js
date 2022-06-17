@@ -1,5 +1,5 @@
 //import { CatalogModel } from '../models/Catalog.js'
-import { ProductModelCollection } from '../models/Product.js'
+import { ProductModel, ProductModelCollection } from '../models/Product.js'
 
 import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 
@@ -8,6 +8,49 @@ import DBUtils from './DBUtils.js'
 import Utils from '../../utils/index.js'
 
 export default class ProductRepositoryFascade {
+
+	async findImagesCounts( catalog_slug, scraper_name )
+	{
+		try {
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+
+			let query1 = {
+				$and: [
+					{
+						$or: [
+							{extension_image: ''},
+							{extension_image: {$exists : false}}
+						]
+					},
+					{
+						scraper_name: scraper_name
+					},
+					{
+						primary_image: {$exists : true}
+					}
+				]
+			}
+
+			let query2 = {
+				$and: [
+					{extension_image: {$exists : true}},
+					{scraper_name: scraper_name},
+					{primary_image: {$exists : true}}
+				]
+			}
+
+			let withoutImagesCount = await model.find(query1).count();
+			let withImagesCount = await model.find(query2).count();
+
+			return {
+				withoutImagesCount: withoutImagesCount,
+				withImagesCount: withImagesCount
+			}
+		} 
+		catch (error) {
+			return null
+		}
+	}
 
 	async saveImage(data) {
 		const { products, catalog_slug } = data

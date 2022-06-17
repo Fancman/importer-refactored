@@ -20,6 +20,8 @@ export default class AstratexDomainStrategy extends DomainStrategy {
 			let paginationHrefs = paginationLinks.map(function(link){
 				return link.href;
 			})
+
+			paginationHrefs = paginationHrefs.filter(link => !link.includes('bonuspage'))
 	
 			let uniquePaginationHrefs = [...new Set(paginationHrefs)];
 	

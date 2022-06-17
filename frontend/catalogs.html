@@ -141,9 +141,9 @@
 										<button @click="stopScrapeLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Stop Scraping Links
 										</button>
-										<button @click="downloadImages(catalog, scraper)" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+										<button x-text="await loadCatalogImagesCounts(catalog, scraper)" @click="downloadImages(catalog, scraper)" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Download Images
-										</button>
+										</button>								
 									</div>
 								</div>
 							</div>
@@ -290,6 +290,23 @@
 
 				return await requestHandler(`${apis.catalogsEndpointUrl}/download-images`, options)
 				.catch(err => console.log(err))
+			},
+			loadCatalogImagesCounts: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				let counts = await requestHandler(`${apis.catalogsEndpointUrl}/load-images-counts`, options)
+				.catch(err => console.log(err))
+				
+				return "Images (Saved: " + counts.withImagesCount + " / Not Saved: " + counts.withoutImagesCount + ")"
 			}
 		}
 	}

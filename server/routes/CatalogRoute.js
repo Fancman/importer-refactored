@@ -34,6 +34,26 @@ export default class ShopRoute extends Route {
 		this._router.patch('/scraper-config', async (req, res, next) => {
 			this.addScraperConfig(req, res, next)
 		})
+
+		this._router.post('/load-images-counts', async (req, res, next) => {
+			this.catalogImagesCounts(req, res, next)
+		})
+		
+	}
+
+	async catalogImagesCounts(req, res, next)
+	{
+		try {
+			let catalog_slug = req.body.catalog.slug
+			let scraper_name = req.body.scraper.name
+
+			let counts =  await this.productRepository.findImagesCounts(catalog_slug, scraper_name)
+
+			return res.send(counts)
+		} catch (error) {
+			res.status(400)
+			return res.end(error.message)
+		}
 	}
 
 	async downloadImages(req, res, next)

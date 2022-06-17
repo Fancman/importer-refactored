@@ -120,7 +120,7 @@ export default class ScraperRoute extends Route {
 		}
 	}
 
-	async stopScrapePagination(req, res, next) {
+	async stopScrapeProducts(req, res, next) {
 		try {
 			let ACTION = 'inspectLinksAndStoreData'
 			let scraper_name = req.body.scraper.name

@@ -42,7 +42,7 @@ class Singleton {
 				return resolve()
 			}
 			
-			fs.mkdirSync(dir, { recursive: true }).then(() => {
+			fs.mkdirSync(dir, { recursive: true }, function (err) {
 				return resolve()
 			})
 		})

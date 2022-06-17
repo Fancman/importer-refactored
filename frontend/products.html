@@ -155,7 +155,10 @@
 						<h1 x-text="product.scraper_name" class="text-gray-900 font-bold text-2xl">Backpack</h1>
 						<p x-text="product.title" class="mt-2 text-gray-600 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit In odit exercitationem fuga id nam quia</p>
 						<div class="flex item-center justify-between mt-3 flex-col">
-							<h1 x-text="product.sale_price" class="text-gray-700 font-bold text-xl">$220</h1>
+							<h2 x-text="'Price: '+ product.price" class="text-gray-700 font-bold text-base">$220</h1>
+							<template x-if="product.sale_price != undefined">
+								<h2 x-text="'Sale price: '+product.sale_price" class="text-gray-700 font-bold text-base">$220</h1>
+							</template>							
 							<a :href="product.url" target="_blank" class="mt-2 px-3 py-2 bg-gray-800 text-white text-xs font-bold uppercase rounded">Link</a>
 						</div>
 						<input x-bind:data-id="product._id" class="my-5 product-checkbox" type="checkbox" />

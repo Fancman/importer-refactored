@@ -66,7 +66,7 @@ export default class PaginationCrawler {
 						catalog_slug: this._data.catalog_slug,
 					})
 
-					for(const pagination_link of paginations){
+					for (const pagination_link of paginations){
 						if( ! visitedPaginationLinks.includes(pagination_link)){
 							if(! paginationLinks.includes(pagination_link)){
 								paginationLinks.push(pagination_link)
@@ -74,6 +74,8 @@ export default class PaginationCrawler {
 						}
 					}
 
+				} else {
+					console.log(result.error)
 				}
 				
 			}
