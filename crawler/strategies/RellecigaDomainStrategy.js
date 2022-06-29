@@ -41,6 +41,9 @@ export default class RellecigaDomainStrategy extends DomainStrategy {
 				'currency' : function(){
 					return 'EUR';
 				},
+				'brand' : function(){
+					return 'Relleciga';
+				},
 				'title' : function(){
 					let elm = document.querySelector('#content header.page-header h1')	
 				
