@@ -52,11 +52,30 @@ class InspectLinksActionCheck extends ActionCheck {
 	
 }
 
+class RecheckProductsActionCheck extends ActionCheck {
+
+	check(data) {
+		if( data.action !== 'recheckProducts'){
+			return false
+		}
+
+		if( !data.hasOwnProperty('products') ){
+			return false
+		}
+
+		return 'RecheckProductsCrawler'
+	}
+	
+}
+
 export default function checkCrawlerActions(data){
 	const crawlPaginationActionCheck = new CrawlPaginationActionCheck()
 	const inspectLinksActionCheck = new InspectLinksActionCheck()
+	const recheckProductsActionCheck = new RecheckProductsActionCheck()
 
 	crawlPaginationActionCheck.setNext(inspectLinksActionCheck);
+
+	inspectLinksActionCheck.setNext(recheckProductsActionCheck);
 
 	let result = crawlPaginationActionCheck.checkAndContinue(data);
 

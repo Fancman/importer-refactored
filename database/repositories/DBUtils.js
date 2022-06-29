@@ -37,6 +37,18 @@ class DBUtils {
 		})
 	}
 
+	async findUpsert(Model, query, record, options = { upsert: true }) {
+		return new Promise( (resolve, reject) => {
+			try {
+				Model.update(query, record, options).then( (doc) => {
+					return resolve(doc)
+				})
+			} catch (error) {
+				return reject(error)
+			}
+		})
+	}
+
 	async insertRecord(Model, record) {
 		return new Promise( (resolve, reject) => {
 			try {

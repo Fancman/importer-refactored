@@ -15,6 +15,12 @@
             "request": "launch",
             "name": "Run Action Check",
             "program" : "${workspaceFolder}\\crawler\\actions\\index.js"
+        },
+		{
+            "type": "node",
+            "request": "launch",
+            "name": "Run JSON import",
+            "program" : "${workspaceFolder}\\import.js"
         }
 	]
 }

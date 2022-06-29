@@ -41,6 +41,43 @@ export default class ScraperRoute extends Route {
 		this._router.post('/scrape-products', async (req, res, next) => {
 			this.scrapeProducts(req, res, next)
 		})
+
+		this._router.post('/recheck-products', async (req, res, next) => {
+			this.recheckProducts(req, res, next)
+		})
+	}
+
+	async recheckProducts(req, res, next) {
+		try {
+			let ACTION = 'recheckProducts'
+
+			let catalog_slug = req.body.catalog.slug
+			let scraper_name = req.body.scraper.name
+			
+			let products = await this.productRepository.getProductsWithStatus(catalog_slug, {
+				scraper_name: scraper_name,
+				status: 'scraped'
+			})
+
+			let data = {
+				action: ACTION,
+				catalog_slug: catalog_slug,
+				products: products,
+				scraper_name: scraper_name
+			}
+
+			let crawlerBuilderInstance = new CrawlerBuilder(this._startegymanager, this._crawlermanager, data)
+
+			await crawlerBuilderInstance.init()
+
+			this._crawlermanager.startAction(scraper_name, ACTION)
+
+			return res.send('Crawling started')
+
+		} catch (error) {
+			res.status(404)
+			return res.end(error.message)
+		}
 	}
 
 	async scrapePagination(req, res, next) {
@@ -79,7 +116,7 @@ export default class ScraperRoute extends Route {
 			let catalog_slug = req.body.catalog.slug
 			let scraper_name = req.body.scraper.name
 			
-			let product_links = await this.productRepository.getProductsWithNoneStatus(catalog_slug, {
+			let product_links = await this.productRepository.getProductsWithStatus(catalog_slug, {
 				scraper_name: scraper_name,
 				status: 'none'
 			})

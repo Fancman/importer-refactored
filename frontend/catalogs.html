@@ -105,10 +105,12 @@
 	</div>
 
 	<div class="container mx-auto mt-5 mb-5">
-		<div class="grid grid-cols-3 gap-4">
+		<div class="grid grid-cols-2 gap-4">
 
-			<div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-				<template x-for="catalog in catalogs" :key="catalog._id">
+			<template x-for="catalog in catalogs" :key="catalog._id">
+
+				<div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+				
 					<div class="px-6 py-4">
 						<div x-text="catalog.title" class="font-bold text-xl mb-2"></div>
 						<div x-text="catalog.url" class="text-sm mb-2"></div>
@@ -141,18 +143,24 @@
 										<button @click="stopScrapeLinks(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Stop Scraping Links
 										</button>
-										<button x-text="await loadCatalogImagesCounts(catalog, scraper)" @click="downloadImages(catalog, scraper)" class="text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+										<button x-text="await loadCatalogImagesCounts(catalog, scraper)" @click="downloadImages(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
 											Download Images
-										</button>								
+										</button>	
+										<button @click="recheckProducts(catalog, scraper)" class="mb-1 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+											Recheck Products
+										</button>							
 									</div>
 								</div>
 							</div>
 						</template>
 						
 					</div>
-				</template>
-			</div>
-		  </div>
+				
+				</div>
+				
+			</template>
+
+		</div>
 	</div>
 </body>
 
@@ -185,6 +193,21 @@
 			},
 			loadCatalogCounts: async function() {
 				return await requestHandler(`${apis.catalogsEndpointUrl}/counts`, {})
+				.catch(err => console.log(err))
+			},
+			recheckProducts: async function(catalog, scraper){
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						scraper: scraper,
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/recheck-products`, options)
 				.catch(err => console.log(err))
 			},
 			scrapeProducts: async function(catalog, scraper){

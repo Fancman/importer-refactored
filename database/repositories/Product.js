@@ -9,6 +9,7 @@ import Utils from '../../utils/index.js'
 
 export default class ProductRepositoryFascade {
 
+
 	async findImagesCounts( catalog_slug, scraper_name )
 	{
 		try {
@@ -239,6 +240,64 @@ export default class ProductRepositoryFascade {
 
 	}
 
+	async storeLinksUpsert(data) {
+		let { scraper_name, links, catalog_slug } = data
+
+		let model = await this.getModelByCatalogSlug(catalog_slug)
+
+		let totalNumberOfLinks = links.length
+		let savedLinks = 0
+
+		for ( const product of links ) {
+
+			try {
+
+				product['scraper_name'] = scraper_name
+	
+				await DBUtils.findUpsert(model, {url: product.url}, product)
+
+				savedLinks++
+
+			} catch (error) {
+				return null
+			}
+			
+		}
+
+		console.log(`Links`, `Saved: ${savedLinks}`, `Total: ${totalNumberOfLinks}`)
+
+	}
+
+	async updateProduct(data, additionalData = {}) {
+		try {
+			let { response, id, catalog_slug } = data
+			let record = {}
+	
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+	
+			for (const [field_name, field_value] of Object.entries(response)) {	
+				record[field_name] = field_value
+			}
+
+			if ( Object.keys( additionalData ).length ) {
+				record = {
+					...record,
+					...additionalData
+				}
+			}
+	
+			let product = await DBUtils.findUpdateById(model, {
+				$set: record
+			}, id)
+	
+			return product
+
+		} catch (error) {
+			return null
+		}
+	
+	}
+
 	async storeProduct(data) {
 		try {
 			let { response, id, catalog_slug } = data
@@ -256,6 +315,8 @@ export default class ProductRepositoryFascade {
 			}
 	
 			record.status = 'scraped'
+			record.active = 1
+			record.changed = 1
 	
 			let product = await DBUtils.findUpdateById(model, {
 				$set: record
@@ -269,37 +330,8 @@ export default class ProductRepositoryFascade {
 	
 	}
 
-	async deactivateProduct(data) {
-		try {
-			let { response, id, catalog_slug } = data
-			let record = {}
 	
-			let model = await this.getModelByCatalogSlug(catalog_slug)
-	
-			for (const [field_name, field_value] of Object.entries(response)) {
-				
-				if ( !['errors', 'fieldErrors'].includes(field_name) ) {
-					continue;
-				}
-		
-				record[field_name] = field_value
-			}
-	
-			record.status = 'deactivated'
-	
-			let product = await DBUtils.findUpdateById(model, {
-				$set: record
-			}, id)
-	
-			return product
-
-		} catch (error) {
-			return null
-		}
-	
-	}
-	
-	async getProductsWithNoneStatus(catalogSlug, criteria){
+	async getProductsWithStatus(catalogSlug, criteria){
 		try {
 			let model = await this.getModelByCatalogSlug(catalogSlug)
 
