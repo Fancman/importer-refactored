@@ -114,6 +114,21 @@
 					<div class="px-6 py-4">
 						<div x-text="catalog.title" class="font-bold text-xl mb-2"></div>
 						<div x-text="catalog.url" class="text-sm mb-2"></div>
+						<div>
+							<template x-for="(records, status) in catalogCounts[catalog.slug]">
+								<div class="flex text-white rounded bg-orange-500 py-1 px-3 my-1 items-baseline">
+									<span x-text="status" class="mr-2"></span>
+									<template x-for="record in records">
+										<div class="inline-flex text-white rounded-full bg-blue-500 py-1 px-3 my-1 items-baseline mr-2">											
+											<template x-for="value in record.values">
+												<span x-text="value.status_name + ' ' + value.status_value" class="mr-2"></span>
+											</template>
+											<span x-text="record.count" class="inline-flex text-white rounded-full bg-red-500 py-1 px-3 my-1 items-baseline mr-2 ml-2"></span>
+										</div>
+									</template>									
+								</div>
+							</template>
+						</div>
 						<h3 class="border-t mb-2 pt-3 font-semibold">Scrapers:</h3>
 						
 						<template x-for="scraper in catalog.scrapers" :key="scraper._id">
@@ -122,7 +137,7 @@
 								<div class="flex justify-between">
 									<span x-text="scraper.name" class="flex py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"></span>
 									<div class="flex-col">
-										<template x-for="(statuses, scraper_name) in catalogCounts[catalog.slug]">
+										<template x-for="(statuses, scraper_name) in catalogShopsCounts[catalog.slug]">
 											<template x-for="(count, status) in statuses">
 												<template x-if="scraper.name==scraper_name">
 													<span x-text="status + ': ' + count " class="block text-white rounded-full bg-orange-500 py-1 px-3 my-1 items-baseline"></span>
@@ -170,6 +185,7 @@
 		return {
 			catalogs: [],
 			scrapers: [],
+			catalogShopsCounts: [],
 			catalogCounts: [],
 			catalogTitle: '',
 			catalogURL: '',
@@ -181,6 +197,7 @@
 
 				this.catalogs = await this.loadCatalogs()
 				this.scrapers = await this.loadScrapers()
+				this.catalogShopsCounts = await this.loadCatalogShopsCounts()
 				this.catalogCounts = await this.loadCatalogCounts()
 			},
 			loadCatalogs: async function() {
@@ -191,8 +208,12 @@
 				return await requestHandler(`${apis.scrapersEndpointUrl}/scrapers`, {})
 				.catch(err => console.log(err))
 			},
-			loadCatalogCounts: async function() {
+			loadCatalogShopsCounts: async function() {
 				return await requestHandler(`${apis.catalogsEndpointUrl}/counts`, {})
+				.catch(err => console.log(err))
+			},
+			loadCatalogCounts: async function() {
+				return await requestHandler(`${apis.catalogsEndpointUrl}/catalog-counts`, {})
 				.catch(err => console.log(err))
 			},
 			recheckProducts: async function(catalog, scraper){

@@ -65,6 +65,30 @@ export default class CatalogRepositoryFascade {
 		})
 	}
 
+
+	async getCatalogStatusesCount(Model){
+		return new Promise( async (resolve, reject) => {
+			try {
+				let counts = await Model.aggregate([
+					{
+						$group: 
+						{
+								_id: {
+									status: "$status",
+									active: "$active",
+									changed: '$changed'
+								},
+								count: { $sum: 1 }
+						}
+					}
+				])
 	
+				return resolve(counts)
+				
+			} catch (error) {
+				return reject(error)
+			}
+		})
+	}
 
 }

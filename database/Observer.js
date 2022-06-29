@@ -26,7 +26,11 @@ class EventsObserver extends EventEmitter {
 		// Ked sa scrapne a priradi kategoria tak sa uploadne na frontend
 		this.on('save_link_data', async (data) => {
 			//console.log("save_link_data event")	
-			this.productRepositoryFascade.storeProduct(data)
+			this.productRepositoryFascade.storeProduct(data, {
+				status: 'scraped',
+				active: 1,
+				changed: 0
+			})
 		})
 
 		// Ked sa scrapne a priradi kategoria tak sa uploadne na frontend
@@ -62,7 +66,7 @@ class EventsObserver extends EventEmitter {
 				{
 					status: 'scraped',
 					active: 0,
-					changed: 1
+					changed: 0
 				}
 			)
 		})

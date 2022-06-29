@@ -28,6 +28,10 @@ export default class ShopRoute extends Route {
 		})
 		
 		this._router.get('/counts', async (req, res, next) => {
+			this.getCatalogShopsCounts(req, res, next)
+		})
+
+		this._router.get('/catalog-counts', async (req, res, next) => {
 			this.getCatalogCounts(req, res, next)
 		})
 
@@ -88,11 +92,77 @@ export default class ShopRoute extends Route {
 		}
 	}
 
-	async getCatalogCounts(req, res, next){
+	async getCatalogShopsCounts(req, res, next){
 		try {
 			let counts = await this.productRepository.getCatalogStatusesCount()
 
 			return res.send(counts)
+
+		} catch (error) {
+			res.status(400)
+			return res.end(error.message)
+		}
+	}
+
+	async getCatalogCounts(req, res, next){
+		try {
+
+			let outputArr = {}
+
+			let catalogs = await new CatalogRepositoryFascade().findCatalogs()
+
+			for ( let catalog of catalogs ) {
+				let catalog_slug = catalog.slug
+
+				let Model = await this.productRepository.getModelByCatalogSlug(catalog_slug)
+
+				let countsData = await this.catalogRepository.getCatalogStatusesCount(Model)
+
+				let cleanCounts = {}
+
+				for ( const countPivot of countsData ) {
+					let _id = countPivot['_id']
+					let count = countPivot['count']
+
+					if (  _id.hasOwnProperty('status') ) {
+
+						let status = _id['status']
+
+						if ( ! cleanCounts.hasOwnProperty(status) ) {
+							cleanCounts[status] = []
+						}
+
+						let arrAdded = {
+							'values' : [],
+							'count' : 0,
+						}
+
+						if ( _id.hasOwnProperty('active') ) {
+							arrAdded['values'].push({
+								'status_name' : 'active',
+								'status_value' : ( _id['active'] === 1 ? 'YES' : 'NO' )
+							})
+						}
+
+						if ( _id.hasOwnProperty('changed') ) {
+							arrAdded['values'].push({
+								'status_name' : 'changed',
+								'status_value' : ( _id['changed'] === 1 ? 'YES' : 'NO' )
+							})
+						}
+
+						arrAdded['count'] = count
+
+						cleanCounts[status].push(arrAdded)
+
+					}
+				}
+
+				outputArr[catalog_slug] = cleanCounts
+			}
+			
+
+			return res.send(outputArr)
 
 		} catch (error) {
 			res.status(400)

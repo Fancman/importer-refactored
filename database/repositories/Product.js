@@ -298,7 +298,7 @@ export default class ProductRepositoryFascade {
 	
 	}
 
-	async storeProduct(data) {
+	async storeProduct(data, additionalData = {}) {
 		try {
 			let { response, id, catalog_slug } = data
 			let record = {}
@@ -314,9 +314,12 @@ export default class ProductRepositoryFascade {
 				record[field_name] = field_value
 			}
 	
-			record.status = 'scraped'
-			record.active = 1
-			record.changed = 1
+			if ( Object.keys( additionalData ).length ) {
+				record = {
+					...record,
+					...additionalData
+				}
+			}
 	
 			let product = await DBUtils.findUpdateById(model, {
 				$set: record
@@ -343,6 +346,7 @@ export default class ProductRepositoryFascade {
 			return null
 		}
 	}
+
 	
 	async getCatalogStatusesCount(){
 		try {
