@@ -2,6 +2,18 @@ import { CatalogModel } from '../models/Catalog.js'
 
 export default class CatalogRepositoryFascade {
 
+	async findOneCatalog(query)
+	{
+		try {
+			let model = await CatalogModel
+			let catalog = await model.findOne(query).exec()
+			return catalog
+		} 
+		catch (error) {
+			return null
+		}
+	}
+
 	async findCatalogs()
 	{
 		try {

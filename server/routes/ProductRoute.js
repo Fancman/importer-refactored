@@ -30,6 +30,31 @@ export default class ProductRoute extends Route {
 		this._router.post('/paginate', async (req, res, next) => {
 			this.paginate(req, res, next)
 		})
+
+		this._router.post('/create-products', async (req, res, next) => {
+			this.createProducts(req, res, next)
+		})
+		
+	}
+
+	async createProducts(req, res, next)
+	{
+		try {
+			let catalog_slug = req.body.catalog.slug
+			let scraper_names = req.body.selectedScrapers
+
+			let products = await this.productRepository.createProducts(
+				catalog_slug,
+				scraper_names
+			)
+
+			return res.send(products)
+			
+		} catch (error) {
+			res.status(400)
+			return res.end(error.message)
+		}
+
 	}
 
 	async paginate(req, res, next)

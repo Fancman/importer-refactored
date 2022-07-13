@@ -129,6 +129,31 @@
 								</div>
 							</template>
 						</div>
+
+						<h3 class="border-t mb-2 pt-3 font-semibold">Actions:</h3>
+
+						<div class="flex flex-row mb-2 pb-2 border-b">
+
+							<div class="mr-3">
+								<input x-model="selectedScrapersToUpload" value="all" class="mr-1" type="checkbox">
+								<label for="all">All</label>
+							</div>
+
+							<template x-for="scraper in catalog.scrapers" :key="scraper._id">
+
+								<div class="mr-3">
+									<input x-model="selectedScrapersToUpload" :value="scraper.name.toString()" class="mr-1" type="checkbox">
+									<label :for="scraper.name" x-text="scraper.name"></label>
+								</div>
+
+							</template>	
+
+						</div>
+
+						<button @click="createProducts(catalog)" class="mt-2 mb-3 text-sm bg-purple-500 hover:bg-blue-700 text-white py-1 px-3 rounded-full">
+							Create products
+						</button>
+
 						<h3 class="border-t mb-2 pt-3 font-semibold">Scrapers:</h3>
 						
 						<template x-for="scraper in catalog.scrapers" :key="scraper._id">
@@ -192,6 +217,7 @@
 			selectedCatalog: '',
 			selectedScraper: '',
 			scraperConfig: '',
+			selectedScrapersToUpload: [],
 			initialize: async function() {	
 				console.log('Initializing')	
 
@@ -199,6 +225,24 @@
 				this.scrapers = await this.loadScrapers()
 				this.catalogShopsCounts = await this.loadCatalogShopsCounts()
 				this.catalogCounts = await this.loadCatalogCounts()
+			},
+			createProducts: async function(catalog) {
+				console.log(catalog)
+				console.log(this.selectedScrapersToUpload)
+
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog,
+						selectedScrapers: this.selectedScrapersToUpload,
+					})
+				}
+
+				return await requestHandler(`${apis.productsEndpointUrl}/create-products`, options)
+				.catch(err => console.log(err))
 			},
 			loadCatalogs: async function() {
 				return await requestHandler(apis.catalogsEndpointUrl, {})

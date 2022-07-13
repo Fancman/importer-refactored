@@ -9,6 +9,73 @@ import Utils from '../../utils/index.js'
 
 export default class ProductRepositoryFascade {
 
+	async createProducts( catalog_slug, scraper_names ) {
+		try {
+			
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+
+			let query = {
+				$and: [
+					{
+						$or : [
+							{ status: 'scraped' },
+							{ status: 'rechecked' }
+						]
+					},
+					{
+						$or : [
+							{ mw: { $exists : false } },
+							{ mw: null }
+						]
+					},
+					{ 
+						$and: [
+							{ 'category.id' : { $exists : true } }
+						]
+					}
+				] 
+			}
+
+			if ( ! scraper_names.includes('all') ) {
+				let finalAndQuery = query['$and']
+				finalAndQuery = finalAndQuery.concat( { scraper_name : { $in : scraper_names } } )
+				query['$and'] = finalAndQuery
+			}
+
+			let products =  await DBUtils.find(model, query)
+
+			console.log( products )
+
+			let catalog = await new CatalogRepositoryFascade().findOneCatalog({
+				slug: catalog_slug
+			})
+
+			if ( catalog === null ) {
+				return null
+			}
+
+			let catalogAdminURL = catalog.url
+
+			let options = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(products)
+			}
+
+			await Utils.requestHandler(`${catalogAdminURL}api/products`, options)
+			.catch(err => {
+				console.log(err)
+				return null
+			})
+
+			return products
+
+		} catch (error) {
+			return null
+		}
+	}
 
 	async findImagesCounts( catalog_slug, scraper_name )
 	{

@@ -241,6 +241,22 @@ class Singleton {
 	  
 		return chunks
 	}
+
+	static requestHandler = async function(endpointUrl, options = {}) {
+		return new Promise(async (resolve, reject) => {
+			console.log('RequestHandler', options)
+	
+			let data = await fetch(endpointUrl, options)
+			.then(r => r.json())
+			.then(response => {
+				return resolve(response)
+			})
+			.catch(err => {
+				return reject(err)
+			})
+		})
+		
+	}
 }
 
 export default Singleton;
