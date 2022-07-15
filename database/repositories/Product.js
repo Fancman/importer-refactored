@@ -64,13 +64,21 @@ export default class ProductRepositoryFascade {
 				body: JSON.stringify(products)
 			}
 
-			await Utils.requestHandler(`${catalogAdminURL}api/products`, options)
+			let response = await Utils.requestHandler(`${catalogAdminURL}api/products`, options)
 			.catch(err => {
 				console.log(err)
 				return null
 			})
 
-			return products
+			for ( let record of response ) {
+				let id = record['id']
+				let mongo_id = record['mongo_id']
+				let error = record['error']
+
+				await DBUtils.findUpdateById(model, { mw: id }, mongo_id)
+			}
+
+			return response
 
 		} catch (error) {
 			return null
