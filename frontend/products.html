@@ -101,6 +101,17 @@
 
 			<div class="mr-4 ml-5">
 				<div>
+					<select x-on:change="searchInputChange()" x-model="selectedShopSearch" x-ref="selectedShopSearchInput" placeholder="Select Shop" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+						<option value="">Select Shop</option>
+						<template x-for="shop in shops" :key="shop._id">
+							<option :value="shop._id" x-text="shop._id + ' - ' + shop.count"></option>
+						</template>
+					</select>
+				</div>
+			</div>
+
+			<div class="mr-4 ml-5">
+				<div>
 					<select x-on:change="searchInputChange()" x-model="selectedCategorySearch" x-ref="selectedCategorySearchInput" placeholder="Select Category" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
 						<option value="">Select Category</option>
 						<option value="0">None</option>
@@ -196,9 +207,11 @@
 			catalogs: [],			
 			products: [],
 			categories: [],
+			shops: [],
 			categoriesIds: [],
 			selectAllCheckbox: false,
 			selectedCategorySearch: null,
+			selectedShopSearch: null,
 			statusFilter: 'scraped',
 			selectedCategoryEdit: '',
 			searchInput: '',
@@ -208,12 +221,13 @@
 				console.log('Initializing')	
 
 				this.catalogs = await this.loadCatalogs()
+				this.shops = await this.loadShops()
 
 				let catalog = await this.getFirstCatalog('initialize')
 
 				this.selectedCatalog = catalog.slug
 
-				await this.loadProducts()
+				await this.loadProducts()							
 				await this.loadCategories()				
 			},
 			selectAll: async function(){
@@ -268,6 +282,23 @@
 				.catch(err => console.log(err))
 				
 				await this.loadProducts()
+			},
+			loadShops: async function() {
+				//scrapers-counts
+				let catalog = await this.getFirstCatalog('loadCategories')
+
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/scrapers-counts`, options)
+				.catch(err => console.log(err))
 			},
 			loadCategories: async function() {
 				try {

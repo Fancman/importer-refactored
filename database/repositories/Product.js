@@ -9,6 +9,21 @@ import Utils from '../../utils/index.js'
 
 export default class ProductRepositoryFascade {
 
+	async findScrapersCounts( catalog_slug )
+	{
+		try {
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+
+
+			let counts = await model.aggregate([ {$project: {scraper_name: 1, _id: 0}} , {$group: { _id: "$scraper_name",  count: { $sum: 1 } }}, {$sort: {count: -1}}])
+
+			return counts
+		} 
+		catch (error) {
+			return null
+		}
+	}
+
 	async createProducts( catalog_slug, scraper_names ) {
 		try {
 			

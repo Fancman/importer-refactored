@@ -3,6 +3,7 @@ import Route from './_index.js'
 import CrawlerBuilder from '../../crawler/CrawlerBuilder.js'
 
 import ProductRepositoryFascade from "../../database/repositories/Product.js"
+import CatalogRepositoryFascade from "../../database/repositories/Catalog.js"
 
 export default class ScraperRoute extends Route {
 
@@ -16,6 +17,7 @@ export default class ScraperRoute extends Route {
 		this._crawlermanager = null
 
 		this.productRepository = new ProductRepositoryFascade()
+		this.catalogRepository = new CatalogRepositoryFascade()
 
 		this._startegymanager = startegyManager
 		this._crawlermanager = crawlerManager
@@ -45,6 +47,25 @@ export default class ScraperRoute extends Route {
 		this._router.post('/recheck-products', async (req, res, next) => {
 			this.recheckProducts(req, res, next)
 		})
+
+		this._router.post('/scrapers-counts', async (req, res, next) => {
+			this.getScrapersCounts(req, res, next)
+		})
+	}
+
+	async getScrapersCounts(req, res, next) {
+		try {
+			let catalog_slug = req.body.catalog.slug
+
+			let counts = await this.productRepository.findScrapersCounts(catalog_slug)
+
+			return res.send(counts)
+		} 
+		catch (error) {
+			res.status(404)
+			return res.end(error.message)
+		}
+
 	}
 
 	async recheckProducts(req, res, next) {
