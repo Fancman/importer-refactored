@@ -65,7 +65,7 @@ export default class ProductRoute extends Route {
 			let products = await this.productRepository.paginate(
 				catalog_slug,
 				{ status: 'scraped' },
-				{ page: 1, limit: 100 }
+				{ page: 1, limit: 1000 }
 			)
 
 			return res.send(products)

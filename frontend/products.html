@@ -5,6 +5,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://cdn.tailwindcss.com"></script>
+	
+	<!-- Alpine Plugins -->
+	<script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+
 	<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
@@ -54,7 +58,7 @@
 
 
 
-<body x-data="crudAlpine()" x-init="initialize">
+<body x-data="crudAlpine()" x-init="initialize" class="scroll-smooth">
 	<header class="text-center bg-blue-800 text-white p-4 mb-10">
 		<div class="text-3xl md:text-5xl mb-3 font-bold"><i class="fa fa-bolt mr-2"></i>Importer App</div>
 		<p>API by <a class="text-blue-300" href="#">Me</a></p>
@@ -174,13 +178,24 @@
 	<div class="container mx-auto mt-5">
 		<div class="py-6 flex flex-wrap">
 			<template x-for="product in products" :key="product._id">
-				<div class="flex m-2 bg-white shadow-lg rounded-lg overflow-hidden product">
-					<template x-if="product.extension_image != undefined && product.extension_image != ''" x-data="{ product: product, url: `../storage/images/${selectedCatalog}/${product._id}.${product.extension_image}` }">
-						<img class="w-2/5 object-cover" :src="url">
+				<div class="flex m-2 bg-white shadow-lg rounded-lg overflow-hidden product"
+				x-data="{show: false}" 
+				x-intersect:enter.once="show = true; imgSrc = $el.querySelector('img').getAttribute('data-src'); $el.querySelector('img').setAttribute('src', imgSrc);">
+
+					<template 
+					x-if="product.extension_image != undefined && product.extension_image != ''"
+					x-data="{ product: product, url: `../storage/images/${selectedCatalog}/${product._id}.${product.extension_image}` }">
+						
+						<img x-cloak x-transition x-show="show" class="w-2/5 object-cover" loading="lazy" :data-src="url">
+
 					</template>
+
 					<template x-if="(product.extension_image == undefined || product.extension_image == '') && product.primary_image != undefined">
-						<img class="w-2/5 object-cover" :src="product.primary_image">
+
+						<img x-cloak x-transition x-show="show" class="w-2/5 object-cover" loading="lazy" :data-src="product.primary_image">
+						
 					</template>
+
 					<div class="w-3/5 p-4 flex flex-col mt-auto">
 						<p x-text="product.status" class="mt-2 text-gray-600 text-sm"></p>
 						<template x-if="product.mw != undefined">
