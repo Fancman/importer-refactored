@@ -102,10 +102,20 @@
 			<div class="mr-4 ml-5">
 				<div>
 					<select x-on:change="searchInputChange()" x-model="selectedShopSearch" x-ref="selectedShopSearchInput" placeholder="Select Shop" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-						<option value="">Select Shop</option>
+						<option value="all">All shops</option>
 						<template x-for="shop in shops" :key="shop._id">
 							<option :value="shop._id" x-text="shop._id + ' - ' + shop.count"></option>
 						</template>
+					</select>
+				</div>
+			</div>
+
+			<div class="mr-4 ml-5">
+				<div>
+					<select x-on:change="searchInputChange()" x-model="selectedMWID" x-ref="selectedMWIDInput" placeholder="MW ID" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+						<option value="all" x-text="'All products MW ID' + ' - ' + (MWCounts.countWithMW + MWCounts.countWithoutMW)"></option>
+						<option value="has_mw" x-text="'Has MW ID' + ' - ' + MWCounts.countWithMW"></option>
+						<option value="no_mw" x-text="'No MW ID' + ' - ' + MWCounts.countWithoutMW"></option>
 					</select>
 				</div>
 			</div>
@@ -172,9 +182,14 @@
 						<img class="w-2/5 object-cover" :src="product.primary_image">
 					</template>
 					<div class="w-3/5 p-4 flex flex-col mt-auto">
-						<p x-text="product.status" class="mt-2 text-gray-600 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit In odit exercitationem fuga id nam quia</p>
+						<p x-text="product.status" class="mt-2 text-gray-600 text-sm"></p>
+						<template x-if="product.mw != undefined">
+							<span x-text="'MW ID: ' + product.mw" class="inline-flex text-white rounded bg-amber-400 py-1 px-3 my-1 items-baseline mr-2"></span>
+						</template>								
+						<span x-text="'Active: ' + product.active" class="inline-flex text-white rounded bg-rose-500 py-1 px-3 my-1 items-baseline mr-2"></span>
+						<span x-text="'Changed: ' + product.changed" class="inline-flex text-white rounded bg-lime-500 py-1 px-3 my-1 items-baseline mr-2"></span>
 						<h1 x-text="product.scraper_name" class="text-gray-900 font-bold text-2xl">Backpack</h1>
-						<p x-text="product.title" class="mt-2 text-gray-600 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit In odit exercitationem fuga id nam quia</p>
+						<p x-text="product.title" class="mt-2 text-gray-600 text-sm"></p>
 						<div class="flex item-center justify-between mt-3 flex-col">
 							<h2 x-text="'Price: '+ product.price" class="text-gray-700 font-bold text-base">$220</h1>
 							<template x-if="product.sale_price != undefined">
@@ -184,14 +199,14 @@
 						</div>
 						<input x-bind:data-id="product._id" class="my-5 product-checkbox" type="checkbox" />
 						<div class="flex-col">
-							<template x-if="product.attr != undefined">
+							<template x-if="product.attr !== undefined">
 								<template x-for="(attr_name, attr_key) in product.attr" :key="index">
-									<span x-text="attr_name"></span>
+									<span x-text="attr_name" class="inline-flex text-white rounded bg-blue-500 py-1 px-3 my-1 items-baseline mr-2"></span>
 								</template>
 							</template>							
 						</div>
 						<template x-if="product.category != undefined && categoriesIds[product.category.id] != undefined">
-							<span x-text="categoriesIds[product.category.id].title"></span>
+							<span x-text="categoriesIds[product.category.id].title" class="inline-flex text-white rounded bg-lime-500 py-1 px-3 my-1 items-baseline mr-2"></span>
 						</template>
 					</div>
 				</div>
@@ -209,6 +224,7 @@
 			categories: [],
 			shops: [],
 			categoriesIds: [],
+			MWCounts: [],
 			selectAllCheckbox: false,
 			selectedCategorySearch: null,
 			selectedShopSearch: null,
@@ -216,12 +232,14 @@
 			selectedCategoryEdit: '',
 			searchInput: '',
 			selectedCatalog: '',
+			selectedMWID: null,
 			timeout: null,
 			initialize: async function() {
 				console.log('Initializing')	
 
 				this.catalogs = await this.loadCatalogs()
 				this.shops = await this.loadShops()
+				this.MWCounts = await this.loadMWCounts()
 
 				let catalog = await this.getFirstCatalog('initialize')
 
@@ -283,9 +301,26 @@
 				
 				await this.loadProducts()
 			},
+			loadMWCounts: async function() {
+				//selectedMWID
+				let catalog = await this.getFirstCatalog('loadMWCounts')
+
+				let options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						catalog: catalog
+					})
+				}
+
+				return await requestHandler(`${apis.scrapersEndpointUrl}/mw-counts`, options)
+				.catch(err => console.log(err))
+			},		
 			loadShops: async function() {
 				//scrapers-counts
-				let catalog = await this.getFirstCatalog('loadCategories')
+				let catalog = await this.getFirstCatalog('loadShops')
 
 				let options = {
 					method: 'POST',
@@ -334,8 +369,9 @@
 				}
 			},
 			catalogChange: async function(){
-				await this.loadProducts()
-				.catch(err => console.log(err))
+				this.initialize()
+				/*await this.loadProducts()
+				.catch(err => console.log(err))*/
 			},
 			searchInputTextChange: async function(){
 				clearTimeout(this.timeout);
@@ -345,7 +381,7 @@
 			},
 			searchInputChange: async function(){
 				let selectedCategoryId = (this.selectedCategorySearch != null && this.selectedCategorySearch !== "") ? parseInt( this.selectedCategorySearch ) : null
-				let catalog = await this.getFirstCatalog('searchInputChange')
+				let catalog = await this.getFirstCatalog('searchInputChange')				
 				
 				let requestBody = {
 					catalog: catalog.slug,
@@ -353,16 +389,20 @@
 					statusFilter: this.statusFilter
 				}
 
-				if( selectedCategoryId != null && selectedCategoryId != 0 ){
+				if ( selectedCategoryId !== null && selectedCategoryId !== 0 ){
 					requestBody.category = {
 						lft: this.categoriesIds[selectedCategoryId]._lft,
 						rgt: this.categoriesIds[selectedCategoryId]._rgt,
 					}
 				}
 
-				if(selectedCategoryId == 0){
+				if (selectedCategoryId === 0){
 					requestBody.category = 0
 				}
+
+				requestBody.scraperName = (this.selectedShopSearch !== "all" ? this.selectedShopSearch : null)
+
+				requestBody.hasMW = (this.selectedMWID !== "all" ? this.selectedMWID : null)
 
 				let options = {
 					method: 'POST',

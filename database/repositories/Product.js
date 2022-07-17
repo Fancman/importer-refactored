@@ -9,6 +9,31 @@ import Utils from '../../utils/index.js'
 
 export default class ProductRepositoryFascade {
 
+	async findMWCounts( catalog_slug )
+	{
+		try {
+			let model = await this.getModelByCatalogSlug(catalog_slug)
+
+
+			let countWithMW = await model.find({ mw: { $exists : true } }).count()
+
+			let countWithoutMW = await model.find({
+				$or : [
+					{ mw: { $exists : false } },
+					{ mw: null }
+				]
+			}).count()
+
+			return {
+				countWithMW,
+				countWithoutMW
+			}
+		} 
+		catch (error) {
+			return null
+		}
+	}
+
 	async findScrapersCounts( catalog_slug )
 	{
 		try {
@@ -203,12 +228,34 @@ export default class ProductRepositoryFascade {
 		return await model.paginate(filter, options)
 	}
 
-	async search( catalog_slug, input, category, status ) {
+	async search( catalog_slug, input, category, status, scraper_name, hasMW ) {
 		let queries = []
+
+		if ( hasMW !== null ) {
+
+			if (hasMW === 'has_mw') {
+				queries.push({ mw: { $exists : true } })
+			} 
+			else if (hasMW === 'no_mw') {
+				queries.push({
+					$or : [
+						{ mw: { $exists : false } },
+						{ mw: null }
+					]
+				})
+			}
+
+		}
 
 		if ( status !== "all" ) {
 			queries.push({
 				status: status
+			})
+		}
+
+		if ( scraper_name !== null ) {
+			queries.push({
+				scraper_name: scraper_name
 			})
 		}
 

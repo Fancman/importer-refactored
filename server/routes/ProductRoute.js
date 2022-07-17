@@ -65,7 +65,7 @@ export default class ProductRoute extends Route {
 			let products = await this.productRepository.paginate(
 				catalog_slug,
 				{ status: 'scraped' },
-				{ page: 1, limit: 500 }
+				{ page: 1, limit: 100 }
 			)
 
 			return res.send(products)
@@ -105,13 +105,17 @@ export default class ProductRoute extends Route {
 			let catalog_slug = req.body.catalog
 			let input = req.body.searchInput
 			let category = req.body.category
+			let scraper_name = req.body.scraperName
 			let status = req.body.statusFilter
+			let hasMW = req.body.hasMW
 
 			let products = await this.productRepository.search(
 				catalog_slug,
 				input,
 				category,
-				status
+				status,
+				scraper_name,
+				hasMW
 			)
 
 			return res.send(products)

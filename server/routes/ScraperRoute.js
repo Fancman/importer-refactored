@@ -51,6 +51,25 @@ export default class ScraperRoute extends Route {
 		this._router.post('/scrapers-counts', async (req, res, next) => {
 			this.getScrapersCounts(req, res, next)
 		})
+
+		this._router.post('/mw-counts', async (req, res, next) => {
+			this.getMWCounts(req, res, next)
+		})
+	}
+
+	async getMWCounts(req, res, next) {
+		try {
+			let catalog_slug = req.body.catalog.slug
+
+			let counts = await this.productRepository.findMWCounts(catalog_slug)
+
+			return res.send(counts)
+		} 
+		catch (error) {
+			res.status(404)
+			return res.end(error.message)
+		}
+
 	}
 
 	async getScrapersCounts(req, res, next) {
