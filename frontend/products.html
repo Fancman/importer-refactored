@@ -107,7 +107,7 @@
 				<div>
 					<select x-on:change="searchInputChange()" x-model="selectedShopSearch" x-ref="selectedShopSearchInput" placeholder="Select Shop" class="block appearance-none bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
 						<option value="all">All shops</option>
-						<template x-for="shop in shops" :key="shop._id">
+						<template x-for="shop in shops">
 							<option :value="shop._id" x-text="shop._id + ' - ' + shop.count"></option>
 						</template>
 					</select>
@@ -229,11 +229,14 @@
 		</div>
 	</div>
 	<div class="dragArea"></div>
+	<span class="loadmore" x-text="page" x-intersect:enter="loadMore()"></span>
 </body>
 <script src="assets/main.js"></script>
 <script>
 	function crudAlpine(){
-		return {		
+		return {	
+			searching: false,
+			page: 1,	
 			catalogs: [],			
 			products: [],
 			categories: [],
@@ -254,6 +257,7 @@
 
 				this.catalogs = await this.loadCatalogs()
 				this.shops = await this.loadShops()
+
 				this.MWCounts = await this.loadMWCounts()
 
 				let catalog = await this.getFirstCatalog('initialize')
@@ -395,6 +399,7 @@
 				}, 1000);
 			},
 			searchInputChange: async function(){
+				this.searching = true
 				let selectedCategoryId = (this.selectedCategorySearch != null && this.selectedCategorySearch !== "") ? parseInt( this.selectedCategorySearch ) : null
 				let catalog = await this.getFirstCatalog('searchInputChange')				
 				
@@ -436,6 +441,16 @@
 				return await requestHandler(apis.catalogsEndpointUrl, {})
 				.catch(err => console.log(err))
 			},
+			sleep: async function(ms) {
+				return new Promise(resolve => setTimeout(resolve, ms));
+			},
+			loadMore: async function() {
+				if ( this.searching === false && this.products.length > 0 ) {
+					this.page++
+					await this.sleep(1000)
+					this.loadProducts()
+				}
+			},
 			loadProducts: async function() {
 
 				let catalog = await this.getFirstCatalog('loadProducts')
@@ -446,22 +461,19 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						catalog: catalog.slug
+						catalog: catalog.slug,
+						page: this.page
 					})
 				}
 
 				let products = await requestHandler(`${apis.productsEndpointUrl}/paginate`, options);
-				this.products = products.docs
-
-				for (let i = 0; i < this.products.length; i++) {
-					let p = this.products
-
-					this.products[i]['image_url'] = p.primary_image
-
-					/*if(p.hasOwnProperty('image_downloaded') && p.image_downloaded == true){
-						this.products['image_url'] = `../storage/images/${p._id}`
-					}*/
-				}		
+				
+				
+				if ( this.page === 0 ) {
+					this.products = products.docs
+				} else {
+					this.products =  [...this.products, ...products.docs]
+				}
 			},
 			getFirstCatalog: async function( start ){
 

@@ -61,11 +61,12 @@ export default class ProductRoute extends Route {
 	{
 		try {
 			let catalog_slug = req.body.catalog
+			let page = req.body.page
 
 			let products = await this.productRepository.paginate(
 				catalog_slug,
 				{ status: 'scraped' },
-				{ page: 1, limit: 1000 }
+				{ page: page, limit: 100 }
 			)
 
 			return res.send(products)
